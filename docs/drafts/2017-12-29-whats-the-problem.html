@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>My Hakyll Blog - «A monad is just a monoid in the category of endofunctors, what's the problem?»</title>
+        <link rel="stylesheet" href="../css/default.css" />
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="../">My Hakyll Blog</a>
+            </div>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>«A monad is just a monoid in the category of endofunctors, what's the problem?»</h1>
+            <article>
+    <section class="header">
+        Posted on December 29, 2017
+        
+    </section>
+    <section>
+        <p><span class="math display">\[\newcommand{cat}{\mathsf}%
+\newcommand{id}{\mathrm{id}}%
+\newcommand{bind}{\mathbin{\mathrm{\gg=}}}%
+\]</span></p>
+<p>The quote in the title is from James Iry’s <a href="http://james-iry.blogspot.de/2009/05/brief-incomplete-and-mostly-wrong.html">A Brief, Incomplete, and Mostly Wrong History of Programming Languages</a> in which he jokingly attributes the quote to Philip Wadler, one of the inventors of Haskell. Actually it is a slightly modified quote from the influential category theory textbook “Categories for the working mathematician” by Saunders Mac Lane (without the part about problems.) It is passed around in functional programming circles, but nobody ever seems to try to explain what it means in detail. Is it just a joke? Trying to make your head explode? Let’s try to understand what it means.</p>
+<p>For a serious attempt at understanding this quote, you should already kind of know what the individual words mean. You’ve seen the <code>Monad</code> and <code>Monoid</code> type classes in Haskell, you should also have had some exposure to the basics of category theory, in particular functors, natural transformations, and products. You should also know the basics of set theory.</p>
+<p>Nothing in this is new, you can find it in most category theory textbooks; <a href="https://bartoszmilewski.com/">Bartosz Milewski</a> has a <a href="https://bartoszmilewski.com/2016/12/27/monads-categorically/">section about the categorical meaning of monads</a>. There was even a similarly-titled <a href="https://blog.merovius.de/2018/01/08/monads-are-just-monoids.html">blog article by Axel Wagner</a> recently (published while I was writing this), which also explains categories and functors, but leaves out the stuff about monoidal categories. You’re invited to check out these other sources if you get stuck reading this article. If nothing else, this article is just an account of something I learned recently.</p>
+<p>The title should more precisely be: “A monad (in a category <span class="math inline">\(C\)</span>) is a monoid object in the monoidal category of endofunctors (of <span class="math inline">\(C\)</span>), where the tensor product is given by composition.” We’re going to disect this definition and see how the parts fit together.</p>
+<h1 id="what-is-a-monoid">What is a monoid?</h1>
+<p>Recall that a <em>monoid</em> is a set <span class="math inline">\(M\)</span> equipped with two additional data: First, a binary operation <span class="math inline">\(\mu : M\times M \to M\)</span>, often called multiplication. The multiplication is often written using some infix operator symbol, e.g. <span class="math inline">\(a\diamond b\)</span> instead of <span class="math inline">\(\mu(a,b)\)</span>. It is required to satisfy an <em>associative law</em>, i.e., <span class="math inline">\(a\diamond(b\diamond c) = (a\diamond b)\diamond c\)</span> should hold for all <span class="math inline">\(a, b, c\in M\)</span>. The second data is a particular element <span class="math inline">\(e\in M\)</span> which acts as a left and right <em>identity element</em>, i.e. for all <span class="math inline">\(a\in M\)</span> we have <span class="math inline">\(e\diamond a = a = a\diamond e\)</span>.</p>
+<p>Of course you know this already. Haskell has a <code>Monoid</code> typeclass which provides a value <code>mempty :: m</code>, which represents the identity element <span class="math inline">\(e\)</span>, and a function <code>mappend :: m -&gt; m -&gt; m</code> which represents the binary operation <span class="math inline">\(\mu\)</span> (in curried form.) Haskell has no way of enforcing the laws, but it is a matter of convention to define a <code>Monoid</code> instance only if the laws hold.</p>
+<p>Now let us step back and, in the spirit of category theory, try to reformulate this definition in terms of objects and arrows, or in <em>point-free</em> form. We need a set <span class="math inline">\(M\)</span>, i.e. an object in the category <span class="math inline">\(\cat{Set}\)</span>. Our binary operation is just a morphism <span class="math inline">\(\mu : M\times M \to M\)</span> in this categeory. What about the identity element? At this point we have to fix an arbitrary singleton set <span class="math inline">\(I = \{*\}\)</span>. It doesn’t matter which, all singleton sets are isomorphic (in Haskell we have the unit type <code>()</code> as a canonical one-element type), so we just write <span class="math inline">\(*\)</span> for its single element. Let <span class="math inline">\(\eta : I\to M\)</span> be the function <span class="math inline">\(\eta(*) = e\)</span>. (Notice that for each set <span class="math inline">\(A\)</span>, specifying a morphism <span class="math inline">\(I\to A\)</span> is equivalent to specifying an element of <span class="math inline">\(A\)</span>.)</p>
+<p>The associative law is <span class="math inline">\(\mu(a,\mu(b,c)) = \mu(\mu(a,b), c)\)</span>, or <span class="math inline">\(\mu((\id_M\times\mu) (a, (b, c))) = \mu((\mu\times\id_M)((a, b), c))\)</span> for all <span class="math inline">\(a, b, c\in M\)</span>. Note the difference in shape between <span class="math inline">\((a,(b,c))\)</span> and <span class="math inline">\(((a,b),c)\)</span>. To write this equation in point-free form, we have to introduce a function that can translate between these shapes:</p>
+<p><span class="math display">\[\alpha : M\times(M\times M) \to (M\times M)\times M\\
+\alpha(a, (b, c)) = ((a, b), c)\]</span></p>
+<p>This function is obviously an isomorphism, it is called an <em>associator</em>. We can now give the associative law in the form of a <em>commutative diagram</em>:</p>
+<p><span class="math display">\[\require{AMScd}
+\begin{CD}
+M\times(M\times M) @&gt;{\id_M\times\mu}&gt;&gt; M\times M @&gt;\mu&gt;&gt; M  \\
+@V{\alpha}VV                                @.              @| \\
+(M\times M)\times M @&gt;{\mu\times\id_M}&gt;&gt; M\times M @&gt;\mu&gt;&gt; M
+\end{CD}
+\]</span></p>
+<p>Calling the diagram <em>commutative</em> means that all paths between two given vertices denote the same morphism. So here that means <span class="math inline">\(\mu\circ(\mu\times \id_M)\circ\alpha = \mu\circ(\id_M\times\mu)\)</span>, or, with elements: <span class="math inline">\(\mu(\mu(a,b), c) = \mu(a,\mu(b,c))\)</span>. Just our associativity law.</p>
+<p>To bring the left identity law, <span class="math inline">\(\mu(e, a) = a\)</span>, into point-free form, we have to replace <span class="math inline">\(e\)</span> by <span class="math inline">\(\eta(*)\)</span>, so the left side becomes <span class="math inline">\(\mu(\eta(*), a) = (\mu \circ (\eta, \id_M))(*,a)\)</span>. We obtain the following commutative diagram, with the right identity law already included:</p>
+<p><span class="math display">\[\begin{CD}
+I\times M @&gt;{\eta\times\id_M}&gt;&gt; M\times M @&lt;{\id_M\times\eta}&lt;&lt; M\times I \\
+@|                               @V{\mu}VV                      @|        \\
+I\times M @&gt;{\lambda}&gt;&gt;              M    @&lt;{\rho}&lt;&lt;         M\times I
+\end{CD}\]</span></p>
+<p>where <span class="math inline">\(\lambda : I\times M\to M, \lambda(*,a) = a\)</span> and <span class="math inline">\(\rho : M\times I\to M, \rho(a,*) = a\)</span> are isomorphisms that perform a role that is similar to the associator <span class="math inline">\(\alpha\)</span>. They are called <em>left</em> and <em>right unitor</em>.</p>
+<p>Now that we have brought the definition into an abstract categorical form, we may start to think about similar constructions in other categories.</p>
+<h1 id="what-is-a-monoidal-category">What is a monoidal category?</h1>
+<p>A monoid gives us a way to multiply elements of a <em>set</em>. Can we also somehow multiply objects of a category? After all, a set can be thought of as a <em>discrete category</em>, that is, a category where the only morphisms are identites.</p>
+<p>To define a monoidal category, start with a category <span class="math inline">\(C\)</span>. For the multiplication, we’re going to need a functor <span class="math inline">\(\otimes : C\times C\to C\)</span>, called the <em>tensor product</em>. The identity is going to be some object <span class="math inline">\(I\in C\)</span>, the <em>unit object</em>. Ideally, we would like to have some analog of the monoid laws as before, that is, <span class="math inline">\(A\otimes(B\otimes C) = (A\otimes B)\otimes C\)</span>, <span class="math inline">\(I\otimes A=A\)</span> and <span class="math inline">\(A\otimes I = A\)</span>. However, this is not going to hold in most interesting cases. Remember the discussion about the associator which translates between different tuple shapes above? Similarly, for a general monoidal category we’re going to need natural translator isomorphisms</p>
+<p><span class="math display">\[\alpha_{ABC} : A\otimes (B\otimes C) \to (A\otimes B)\otimes C,\]</span> <span class="math display">\[\lambda_A : I\otimes A \to A,\]</span> <span class="math display">\[\rho_A : A\otimes I\to A.\]</span></p>
+<p>Sometimes equality does hold, however, and a monoidal category where this is the case, or in which these translation morphisms are identities, is called <em>strict</em>.</p>
+<p>We demand that they satisfy the following <em>coherence laws</em> to make sense, expressed as commutative diagrams.</p>
+<p><span class="math display">\[\begin{CD}
+A\otimes(I\otimes B) @&gt;{\alpha_{AIB}}&gt;&gt; (A\otimes I)\otimes B  \\
+@V{\id_A\otimes\lambda_B}VV         @V{\rho_A\otimes\id_B}VV \\
+A\otimes B           @=           A\otimes B
+\end{CD}\]</span></p>
+<p>and the so-called pentagon</p>
+<p><span class="math display">\[\begin{CD}
+A\otimes(B\otimes(C\otimes D)) @= A\otimes(B\otimes(C\otimes D)) \\
+@V{\alpha}VV                           @V{\id_A\otimes\alpha}VV      \\
+(A\otimes B)\otimes(C\otimes D) @.  A\otimes((B\otimes C)\otimes D)\\
+@V{\alpha}VV                           @V{\alpha}VV              \\
+((A\otimes B)\otimes C)\otimes D @&lt;{\alpha\otimes \id_D}&lt;&lt; (A\otimes (B\otimes C))\otimes D 
+\end{CD}\]</span></p>
+<p>Unfortunately, for technical reasons, my diagram doesn’t quite have a pentagonal shape. I also hope that the simplified notation doesn’t cause confusion. The upper left <span class="math inline">\(\alpha\)</span> stands for <span class="math inline">\(\alpha_{A,B,C\otimes D}\)</span>, for example. It should always be clear from the context what is meant.</p>
+<p><em>Examples:</em></p>
+<ol style="list-style-type: decimal">
+<li>We have already seen an example of a monoidal category, namely <span class="math inline">\(\cat{Set}\)</span> with the ordinary product for the tensor product and a singleton <span class="math inline">\(I = \{*\}\)</span> for the unit object, with</li>
+</ol>
+<p><span class="math display">\[\alpha((a, b), c) = (a, (b, c))\]</span> <span class="math display">\[\lambda(*,a) = a\]</span> <span class="math display">\[\rho(a,*) = a\]</span>.</p>
+<ol start="2" style="list-style-type: decimal">
+<li><p>A similar example is the category <span class="math inline">\(\cat{Set}\)</span> again, only this time we take the coproduct (disjoint union, <code>Either</code>) for the tensor product, and the empty set <span class="math inline">\(\emptyset\)</span> for the unit object. The associator and unitors can be defined in the obvious way.</p></li>
+<li><p>In linear algebra, we work in the category <span class="math inline">\(\cat{Vect}_K\)</span> of vector spaces over a field <span class="math inline">\(K\)</span>, where the morphisms are <span class="math inline">\(K\)</span>-linear maps. It is a monoidal category with respect to the usual tensor product of vector spaces, with <span class="math inline">\(K\)</span> considered as a vector space over itself as the unit object. Similarly, for a commutative ring <span class="math inline">\(R\)</span>, the category of <span class="math inline">\(R\)</span>-modules is a monoidal category wrt. the tensor product over <span class="math inline">\(R\)</span>.</p></li>
+</ol>
+<h1 id="what-is-a-monoid-object">What is a monoid object?</h1>
+<p>A monoid object is at this point a straight-forward generalization of a monoid to monoidal categories. Consider a fixed monoidal category <span class="math inline">\((C, \otimes, I, \alpha, \lambda, \rho)\)</span>. A monoid object in this category is an object <span class="math inline">\(M\in C\)</span> together with morphisms</p>
+<p><span class="math display">\[\mu : M\otimes M\to M\]</span> and <span class="math display">\[\eta : I\to M\]</span></p>
+<p>such that the following diagrams commute:</p>
+<p><span class="math display">\[\begin{CD}
+M\otimes(M\otimes M) @&gt;{\id_M\otimes\mu}&gt;&gt; M\otimes M @&gt;\mu&gt;&gt; M   \\
+@V{\alpha_{MMM}}VV                           @.               @|  \\
+(M\otimes M)\otimes M @&gt;{\mu \otimes \id_M}&gt;&gt; M\otimes M @&gt;\mu&gt;&gt; M
+\end{CD}
+\]</span></p>
+<p>and <span class="math display">\[\begin{CD}
+I\otimes M @&gt;{\eta\otimes\id_M}&gt;&gt; M\otimes M @&lt;{\id_M\otimes\eta}&lt;&lt; M\otimes I\\
+@|                                  @V{\mu}VV                        @|     \\
+I\otimes M @&gt;{\lambda_M}&gt;&gt;               M          @&lt;{\rho_M}&lt;&lt;          M\otimes I
+\end{CD}
+\]</span></p>
+<p>You can easily convince yourself that a monoid is just a monoid object in <span class="math inline">\((\cat{Set}, \times)\)</span>.</p>
+<p>Exercises: What is a monoid in <span class="math inline">\((\cat{Set},\sqcup)\)</span>? If you’re familiar with tensor products of abelian groups, try to figure out what a monoid object in <span class="math inline">\((\cat{Ab}, \otimes)\)</span> is.</p>
+<h1 id="what-is-the-category-of-endofunctors">What is the category of endofunctors?</h1>
+<p>Let <span class="math inline">\(C\)</span> be a category. An endofunctor of <span class="math inline">\(C\)</span> is a functor <span class="math inline">\(C\to C\)</span>. Morphisms of functors are natural transformations. If <span class="math inline">\(F,G,H\)</span> are endofunctors of <span class="math inline">\(C\)</span>, and <span class="math inline">\(\alpha:F\to G\)</span>, <span class="math inline">\(\beta : G\to H\)</span> are natural transformations, we can define the composition component-wise,</p>
+<p><span class="math display">\[ (\beta\circ\alpha)_X = \alpha_X\circ\beta_X. \]</span></p>
+<p>It is easy to check that this results in a natural transformation <span class="math inline">\(\beta\circ\alpha : F\to H\)</span>, and that the composition is associative and acts as expected on identities, so we have a category <span class="math inline">\(\mathcal{E}\)</span> of endofunctors of <span class="math inline">\(C\)</span>. To arrive at monads eventually, we take the <em>composition</em> of functors as our tensor product and the identity functor as unit object.</p>
+<p>This choice has the nice property that this will actually be a strict monoidal category, because <span class="math inline">\(F\circ (G\circ H) = (F\circ G)\circ H\)</span>, <span class="math inline">\(\mathit{Id}\circ F = F = F\circ\mathit{Id}\)</span>. However, the action of the composition functor <span class="math inline">\(\circ: \mathcal{E}\times\mathcal{E}\to\mathcal{E}\)</span>, our tensor product, on morphisms is a little tricky.</p>
+<p>Let <span class="math inline">\(f: F\to F'\)</span>, <span class="math inline">\(g:G\to G'\)</span> be two morphisms in <span class="math inline">\(\mathcal{E}\)</span>. We want to construct a morphism <span class="math inline">\(f\otimes g: F\circ G\to F'\circ G'\)</span>. Let’s examine the issue for a given object <span class="math inline">\(A\)</span> of <span class="math inline">\(C\)</span>. Starting at <span class="math inline">\(F(G(A))\)</span>, we can apply the <span class="math inline">\(G(A)\)</span>-component of <span class="math inline">\(f\)</span>,</p>
+<p><span class="math display">\[f_{G(A)} : F(G(A))\to F'(G(A)),\]</span></p>
+<p>then lift the <span class="math inline">\(A\)</span>-component of <span class="math inline">\(g\)</span> over <span class="math inline">\(F'\)</span> to obtain a morphism</p>
+<p><span class="math display">\[F'(g_A) : F'(G(A)) \to F'(G'(A)).\]</span></p>
+<p>We could, however, also apply <span class="math inline">\(F(g_A)\)</span> first and then <span class="math inline">\(f_{G'(A)}\)</span>. It turns out that this choice does not matter, or in other words, the following diagram is commutative for all objects <span class="math inline">\(A\)</span> of <span class="math inline">\(C\)</span>:</p>
+<p><span class="math display">\[\begin{CD}
+FG(A) @&gt;{f_{G(A)}}&gt;&gt; F'G(A) \\
+@V{F(g_A)}VV        @V{F'(g_A)}VV \\
+FG'(A) @&gt;{f_{G'(A)}}&gt;&gt; F'G'(A)
+\end{CD}
+\]</span></p>
+<p>and we obtain the desired natural transformation <span class="math inline">\(f\otimes g\)</span>. It is called the <em>horizontal composition</em> of <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span> and usually denoted <span class="math inline">\(f\bullet g\)</span>. Note that by convention, sometimes an object stands for the identity morphism belonging to that object. So if you see something like <span class="math inline">\(f\bullet G\)</span>, this is the same as <span class="math inline">\(f\bullet \id_G\)</span> etc., and you could work out what it means by applying the definition. There’s a useful shortcut however, just remember that <span class="math inline">\(f\bullet G\)</span> is the natural transformation whose components are <span class="math inline">\(f_{G(A)}\)</span>, while <span class="math inline">\(F\bullet g\)</span> has the components <span class="math inline">\(F(g_A)\)</span>, for all <span class="math inline">\(A\)</span>.</p>
+<h1 id="putting-it-together-what-is-a-monad">Putting it together: What is a monad?</h1>
+<p>See title of this post.</p>
+<p>Just kidding. It is probably worthwile to walk through the whole construction again. Let <span class="math inline">\(M\in\mathcal{E}\)</span> be a monoid object in the category <span class="math inline">\(\mathcal{E}\)</span> of endofunctors of <span class="math inline">\(C\)</span>, where the tensor product is given by composition of functors. That is, <span class="math inline">\(M\)</span> is a functor <span class="math inline">\(C\to C\)</span>, and there are two natural transformations</p>
+<p><span class="math display">\[\mu : M\circ M \to M,\]</span> the multiplication, and <span class="math display">\[\eta : \mathit{Id}\to M,\]</span> the unit.</p>
+<p>In Haskell, the multiplication is called <code>join</code> with the signature <code>join :: m (m a) -&gt; m a</code>; the unit is called <code>return</code> or <code>pure</code> with the signature <code>return :: a -&gt; m a</code>.</p>
+<p>We require associativity:</p>
+<p><span class="math display">\[\begin{CD}
+M\circ M\circ M @&gt;{\id_M\bullet\mu}&gt;&gt; M\circ M @&gt;{\mu}&gt;&gt; M \\
+@|                                      @.               @| \\
+M\circ M\circ M @&gt;{\mu\bullet\id_M}&gt;&gt;  M\circ M @&gt;{\mu}&gt;&gt; M
+\end{CD}\]</span></p>
+<p>and <span class="math inline">\(\eta\)</span> should be a left and right identity</p>
+<p><span class="math display">\[\begin{CD}
+\mathit{Id} \circ M @&gt;{\eta\bullet\id_M}&gt;&gt; M\circ M @&lt;{\id_M\bullet\eta}&lt;&lt; M\circ \mathit{Id} \\
+@|                                         @V{\mu}VV                    @| \\
+M  @=                                      M                  @=        M
+\end{CD}\]</span></p>
+<p>The corresponding equations are</p>
+<p><span class="math display">\[\begin{align*}
+\mu \circ (\mu\bullet\id_M) &amp;= \mu \circ (\id_M\bullet\mu) \\
+\mu\circ(\eta\bullet\id_M) &amp;= \id_M \\
+\mu\circ(\id_M\bullet\eta) &amp;= \id_M
+\end{align*}\]</span></p>
+<p>or, in Haskell:</p>
+<p><code>join . join == join . fmap join</code>,</p>
+<p><code>join . return == id</code>,</p>
+<p><code>join . fmap return == id</code>.</p>
+<p>Or, in plain english: In a nested monad structure, it doesn’t matter in which order the layers are <code>join</code>ed (associativity). When <code>return</code>ing a monadic value and then <code>join</code>ing, it doesn’t matter whether the <code>return</code> wraps the given monadic value or whether the <code>return</code> is lifted inside, in both cases we end up where we started (left and right identity.)</p>
+<h1 id="monad-laws">Monad laws</h1>
+<p>In Haskell, the <code>Monad</code> typeclass is defined in terms of two functions, <code>return</code> and <code>&gt;&gt;=</code> (called “bind”), and instances are supposed to satisfy the following “Monad laws”:</p>
+<ol style="list-style-type: decimal">
+<li><code>m &gt;&gt;= return == m</code></li>
+<li><code>return x &gt;&gt;= f == f x</code></li>
+<li><code>(m &gt;&gt;= f) &gt;&gt;= g == m &gt;&gt;= (\x -&gt; f x &gt;&gt;= g)</code></li>
+</ol>
+<p>There’s also a <code>join</code> function, which can be defined in terms of bind, and vice versa:</p>
+<pre><code>m &gt;&gt;= f = join (fmap f m)
+
+join mma = mma &gt;&gt;= id</code></pre>
+<p>Thus we have another notion of “monad”, and we can translate back and forth between the categorical and the Haskell view. We’re going to show that the two notions are equivalent.</p>
+<p>Until now the discussion has been agnostic about the nature of our base category <span class="math inline">\(C\)</span>, but now we need a concrete category, where objects have elements and morphisms are functions. So in the following, let’s say <span class="math inline">\(C=\cat{Set}\)</span>, or <span class="math inline">\(C=\cat{Hask}\)</span>, whichever you prefer.</p>
+<h2 id="theorem">Theorem:</h2>
+<p>An endofunctor <span class="math inline">\(M\in\mathcal E\)</span> is a monad (in the categorical sense) if and only if it satisfies the following conditions, which are known as “Monad Laws”:</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(m\bind \eta = m\)</span> for <span class="math inline">\(m\in M(A)\)</span></li>
+<li><span class="math inline">\(\eta(x) \bind f = f(x)\)</span> for <span class="math inline">\(x\in A\)</span> and <span class="math inline">\(f: A\to M(B)\)</span></li>
+<li><span class="math inline">\((m\bind f)\bind g = m \bind (\lambda x . f(x) \bind g)\)</span> for <span class="math inline">\(m\in M(A)\)</span>, <span class="math inline">\(f:A\to M(B)\)</span> and <span class="math inline">\(g:B\to M(C)\)</span>.</li>
+</ol>
+<h3 id="proof">Proof:</h3>
+<p>First we’re going to show that a monad <span class="math inline">\(M\in\mathcal E\)</span> satisfies the monad laws.</p>
+<p>Recall that <span class="math inline">\(\bind\)</span> is defined by <span class="math inline">\(m\bind f = \mu(M(f)(m))\)</span> for <span class="math inline">\(m\in M(A)\)</span>, <span class="math inline">\(f:A\to M(B)\)</span>, and conversely <span class="math inline">\(\mu\)</span> is defined by <span class="math inline">\(\mu(x) = x\bind\id\)</span> for <span class="math inline">\(x\in M(M(A))\)</span>. Use of these definitions will not be specially marked in the following.</p>
+<ol style="list-style-type: decimal">
+<li><p>Let <span class="math inline">\(m\in M(A)\)</span>. Then <span class="math inline">\(m\bind\eta = \mu(M(\eta)(m)) \stackrel*= m\)</span>, where the marked equality holds by the <em>right identity law</em>, <span class="math inline">\(\mu\circ (M\bullet\eta) = \id\)</span>.</p></li>
+<li><p>Let <span class="math inline">\(x\in A\)</span> and <span class="math inline">\(f: A\to M(B)\)</span>. Then</p></li>
+</ol>
+<p><span class="math display">\[\eta(a)\bind f = \mu(M(f)(\eta(x))) \stackrel*= \mu(\eta(f(x)))
+\stackrel{**}= f(x)\]</span></p>
+<p>where the first equality marked <span class="math inline">\(*\)</span> holds because <span class="math inline">\(\eta\)</span> is a natural transformation <span class="math inline">\(\mathit{Id}\to M\)</span>, hence <span class="math inline">\(M(f)\circ \eta_A = \eta_{F(A)}\circ f\)</span>, and the one marked <span class="math inline">\(**\)</span> holds by the <em>left identity law</em>, <span class="math inline">\(\mu\circ (\eta\bullet M) = \id\)</span>.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>Let <span class="math inline">\(m\in M(A)\)</span>, <span class="math inline">\(f:A\to M(B)\)</span>, <span class="math inline">\(g:B\to M(C)\)</span>.</li>
+</ol>
+<p><span class="math display">\[\begin{align*}
+(m\bind f)\bind g &amp;= \mu(M(f)(m)) \bind g \\
+&amp;= \mu(M(g)(\mu(M(f)(m)))) \\
+&amp;\stackrel*= \mu(\mu(M(M(g)\circ f)(m))) \\
+&amp;\stackrel{**}=\mu(M(\mu)(M(M(g)\circ f)(m))) \\
+&amp;= \mu(M(\mu\circ M(g) \circ f)(m)) \\
+&amp;= m \bind \mu\circ M(g) \circ f \\
+&amp;= m \bind (\lambda x . f(x) \bind g)
+\end{align*}
+\]</span></p>
+<p>where the <span class="math inline">\(*\)</span> holds because of naturality of <span class="math inline">\(\mu: M\circ M\to M\)</span>: <span class="math inline">\(M(g)\circ \mu_B = \mu_{MC}\circ M(M(g))\)</span>, and <span class="math inline">\(**\)</span> holds by the <em>associative law</em>, <span class="math inline">\(\mu\circ(\mu\bullet M) = \mu\circ(M\bullet\mu)\)</span>.</p>
+<p>Conversely, let <span class="math inline">\(M\in\mathcal E\)</span> be an endofunctor that satisfies the monad laws 1, 2 and 3.</p>
+<ol style="list-style-type: decimal">
+<li><p>Let <span class="math inline">\(m\in M(A)\)</span>. Then by law 1, <span class="math inline">\(\mu(M(\eta)(m)) = m\bind \eta \stackrel*= m\)</span>, so the <em>right identity law</em> <span class="math inline">\(\mu\circ(M\bullet\eta)=\id\)</span> follows.</p></li>
+<li><p>Let <span class="math inline">\(m\in M(A)\)</span>. Then by law 2, <span class="math inline">\(\mu(\eta(m)) = \eta(m)\bind\id \stackrel*= \id(m) = m\)</span>. This shows the <em>left identity law</em>, <span class="math inline">\(\mu\circ(\eta\bullet M) = \id\)</span>.</p></li>
+<li><p>Let <span class="math inline">\(m\in MMM(A)\)</span>. Then <span class="math display">\[\begin{align*}
+\mu(M(\mu)(m)) &amp;= m\bind\mu \\
+&amp;= m\bind(\lambda x.x\bind\id) \\
+&amp;\stackrel*= (m\bind\id)\bind\id \\
+&amp;= \mu(\mu(m))
+\end{align*}\]</span></p></li>
+</ol>
+<p>where we used law 3. This shows the <em>associative law</em>, <span class="math inline">\(\mu\circ(M\bullet\mu) = \mu\circ(\mu\bullet M)\)</span>.</p>
+    </section>
+</article>
+
+        </main>
+
+        <footer>
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </footer>
+    </body>
+</html>
