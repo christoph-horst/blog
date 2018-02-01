@@ -23,6 +23,13 @@ main = hakyllWith (defaultConfiguration { destinationDirectory = "docs" }) $ do
             >>= loadAndApplyTemplate "templates/default.html" defaultContext
             >>= relativizeUrls
 
+    match "drafts/*" $ do
+      route $ setExtension "html"
+      compile $ pandocMathCompiler
+        >>= loadAndApplyTemplate "templates/post.html" postCtx
+        >>= loadAndApplyTemplate "templates/default.html" postCtx
+        >>= relativizeUrls
+
     match "posts/*" $ do
         route $ setExtension "html"
         compile $ pandocMathCompiler
