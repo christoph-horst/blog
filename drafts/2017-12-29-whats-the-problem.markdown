@@ -5,6 +5,10 @@ title: «A monad is just a monoid in the category of endofunctors, what's the pr
 $$\newcommand{cat}{\mathsf}%
 \newcommand{id}{\mathrm{id}}%
 \newcommand{bind}{\mathbin{\mathrm{\gg=}}}%
+\newcommand{kleisli}{\mathbin{\mathrm{>=>}}}%
+\newcommand{lkleisli}{\mathbin{\mathrm{<=<}}}%
+\newcommand{natto}{\stackrel{\bullet}{\to}}%
+\newcommand{Id}{\mathrm{Id}}%
 $$
 
 The quote in the title is from James Iry's
@@ -54,7 +58,7 @@ multiplication. The multiplication is often written using some infix
 operator symbol, e.g. $a\diamond b$ instead of $\mu(a,b)$. It is
 required to satisfy an *associative law*, i.e., $a\diamond(b\diamond c)
 = (a\diamond b)\diamond c$ should hold for all $a, b, c\in M$. The
-second data is a particular element $e\in M$ which acts as a left and
+second datum is a particular element $e\in M$ which acts as a left and
 right *identity element*, i.e. for all $a\in M$ we have $e\diamond a =
 a = a\diamond e$.
 
@@ -71,17 +75,18 @@ reformulate this definition in terms of objects and arrows, or in
 $\cat{Set}$. Our binary operation is just a morphism $\mu : M\times M
 \to M$ in this categeory. What about the identity element? At this
 point we have to fix an arbitrary singleton set $I = \{*\}$. It
-doesn't matter which, all singleton sets are isomorphic (in Haskell we
-have the unit type `()` as a canonical one-element type), so we just
-write $*$ for its single element. Let $\eta : I\to M$ be the function
-$\eta(*) = e$. (Notice that for each set $A$, specifying a morphism
-$I\to A$ is equivalent to specifying an element of $A$.)
+doesn't matter which, since all singleton sets are isomorphic, but it
+is customary to denote this element by an asterisk. (In Haskell we
+have the unit type `()` as a canonical one-element type.) Let $\eta :
+I\to M$ be the function $\eta(*) = e$. (Notice that for each set $A$,
+specifying a morphism $I\to A$ is equivalent to specifying an element
+of $A$.)
 
 The associative law is $\mu(a,\mu(b,c)) = \mu(\mu(a,b), c)$, or
 $\mu((\id_M\times\mu) (a, (b, c))) = \mu((\mu\times\id_M)((a, b), c))$
-for all $a, b, c\in M$. Note the difference in shape between
+for all $a, b, c\in M$. Note the difference in "shape" between
 $(a,(b,c))$ and $((a,b),c)$. To write this equation in point-free
-form, we have to introduce a function that can translate between these
+form, we have to introduce a function that can translate between those
 shapes:
 
 $$\alpha : M\times(M\times M) \to (M\times M)\times M\\
@@ -229,7 +234,7 @@ $$
 You can easily convince yourself that a monoid is just a monoid object
 in $(\cat{Set}, \times)$.
 
-Exercises: What is a monoid in $(\cat{Set},\sqcup)$? If you're
+Exercises: What is a monoid object in $(\cat{Set},\sqcup)$? If you're
 familiar with tensor products of abelian groups, try to figure out
 what a monoid object in $(\cat{Ab}, \otimes)$ is.
 
@@ -237,24 +242,23 @@ what a monoid object in $(\cat{Ab}, \otimes)$ is.
 
 Let $C$ be a category. An endofunctor of $C$ is a functor $C\to
 C$. Morphisms of functors are natural transformations. If $F,G,H$ are
-endofunctors of $C$, and $\alpha:F\to G$, $\beta : G\to H$ are natural
+endofunctors of $C$, and $\alpha:F\natto G$, $\beta : G\natto H$ are natural
 transformations, we can define the composition component-wise,
 
 $$ (\beta\circ\alpha)_X = \alpha_X\circ\beta_X. $$
 
-It is easy to check that this results in a natural transformation
-$\beta\circ\alpha : F\to H$, and that the composition is associative
-and acts as expected on identities, so we have a category
+It is easy to check that this *vertical composition* results in a
+natural transformation $\beta\circ\alpha : F\natto H$, and that it is
+associative and acts as expected on identities, so we have a category
 $\mathcal{E}$ of endofunctors of $C$. To arrive at monads eventually,
 we take the *composition* of functors as our tensor product and the
 identity functor as unit object.
 
 This choice has the nice property that this will actually be a strict
 monoidal category, because $F\circ (G\circ H) = (F\circ G)\circ H$,
-$\mathit{Id}\circ F = F = F\circ\mathit{Id}$. However, the action of
-the composition functor $\circ:
-\mathcal{E}\times\mathcal{E}\to\mathcal{E}$, our tensor product, on
-morphisms is a little tricky.
+$\Id\circ F = F = F\circ\Id$. However, the action of the composition
+functor $\circ: \mathcal{E}\times\mathcal{E}\to\mathcal{E}$, our
+tensor product, on morphisms is a little tricky.
 
 Let $f: F\to F'$, $g:G\to G'$ be two morphisms in $\mathcal{E}$. We want to
 construct a morphism $f\otimes g: F\circ G\to F'\circ G'$. Let's
@@ -268,7 +272,8 @@ then lift the $A$-component of $g$ over $F'$ to obtain a morphism
 $$F'(g_A) : F'(G(A)) \to F'(G'(A)).$$
 
 We could, however, also apply $F(g_A)$ first and then $f_{G'(A)}$. It
-turns out that this choice does not matter, or in other words, the following diagram is commutative for all objects $A$ of $C$:
+turns out that this choice does not matter, or in other words, the
+following diagram is commutative for all objects $A$ of $C$:
 
 $$\begin{CD}
 FG(A) @>{f_{G(A)}}>> F'G(A) \\
@@ -290,21 +295,19 @@ $A$.
 
 # Putting it together: What is a monad?
 
-See title of this post.
-
-Just kidding. It is probably worthwile to walk through the whole
-construction again. Let $M\in\mathcal{E}$ be a monoid object in the
-category $\mathcal{E}$ of endofunctors of $C$, where the tensor
+See title of this post (j/k). It is probably worthwile to walk through
+the whole construction again. Let $M\in\mathcal{E}$ be a monoid object
+in the category $\mathcal{E}$ of endofunctors of $C$, where the tensor
 product is given by composition of functors. That is, $M$ is a functor
 $C\to C$, and there are two natural transformations
 
-$$\mu : M\circ M \to M,$$
+$$\mu : M\circ M \natto M,$$
 the multiplication, and
-$$\eta : \mathit{Id}\to M,$$
+$$\eta : \Id\natto M,$$
 the unit.
 
 In Haskell, the multiplication is called `join` with the signature
-`join :: m (m a) -> m a`; the unit is called `return` or `pure` with
+`join :: m (m a) -> m a`; the unit is called `return` (or `pure`) with
 the signature `return :: a -> m a`.
 
 We require associativity:
@@ -318,7 +321,7 @@ M\circ M\circ M @>{\mu\bullet\id_M}>>  M\circ M @>{\mu}>> M
 and $\eta$ should be a left and right identity
 
 $$\begin{CD}
-\mathit{Id} \circ M @>{\eta\bullet\id_M}>> M\circ M @<{\id_M\bullet\eta}<< M\circ \mathit{Id} \\
+\Id \circ M @>{\eta\bullet\id_M}>> M\circ M @<{\id_M\bullet\eta}<< M\circ \Id \\
 @|                                         @V{\mu}VV                    @| \\
 M  @=                                      M                  @=        M
 \end{CD}$$
@@ -397,7 +400,7 @@ $$\eta(a)\bind f = \mu(M(f)(\eta(x))) \stackrel*= \mu(\eta(f(x)))
 \stackrel{**}= f(x)$$
 
 where the first equality marked $*$ holds because $\eta$ is a natural
-transformation $\mathit{Id}\to M$, hence $M(f)\circ \eta_A =
+transformation $\Id\to M$, hence $M(f)\circ \eta_A =
 \eta_{F(A)}\circ f$, and the one marked $**$ holds by the *left
 identity law*, $\mu\circ (\eta\bullet M) = \id$.
 
@@ -438,3 +441,24 @@ $$\begin{align*}
 \end{align*}$$
 
 where we used law 3. This shows the *associative law*, $\mu\circ(M\bullet\mu) = \mu\circ(\mu\bullet M)$.
+
+Notes:
+
+* I have completely ignored the issue of naturality of `return`, `>>=`
+  and `join`. According to the definition, these functions should be
+  natural transformations. We don't have to worry, however, because
+  due to parametric polymorphism it is indeed impossible to write a
+  function `h :: F a -> G a` between functors `F` and `G` that is not
+  a natural transformation. There is a whole class of such theorems,
+  which go under the slogan "Theorems for free", among them: the only
+  (total) function `a -> a` is the identity, and if a type of kind `*
+  -> *` can be a `Functor` at all, it has a unique instance. I plan to
+  write an article about this topic later.
+
+* The monad laws can be more elegantly put in terms of _Kleisli
+  composition_, which is simultaneously easily understood as the
+  composition in a special category and easily defined in terms of
+  "bind". This results in an interpretation of "bind" as some kind of
+  "Kleisli application", so our intuitions about normal function
+  application and composition directly carry over. But this topic
+  deserves its own article.
