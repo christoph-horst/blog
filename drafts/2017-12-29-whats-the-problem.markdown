@@ -442,7 +442,7 @@ $$\begin{align*}
 
 where we used law 3. This shows the *associative law*, $\mu\circ(M\bullet\mu) = \mu\circ(\mu\bullet M)$.
 
-Notes:
+# Notes
 
 * I have completely ignored the issue of naturality of `return`, `>>=`
   and `join`. According to the definition, these functions should be

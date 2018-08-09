@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>My Hakyll Blog - Monads from adjunctions, adjunctions from monads.</title>
+        <link rel="stylesheet" href="../css/default.css" />
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="../">My Hakyll Blog</a>
+            </div>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>Monads from adjunctions, adjunctions from monads.</h1>
+            <article>
+    <section class="header">
+        Posted on July  7, 2018
+        
+    </section>
+    <section>
+        <p><span class="math display">\[\newcommand{cat}{\mathsf}%
+\newcommand{id}{\mathrm{id}}%
+\newcommand{bind}{\mathbin{\mathrm{\gg=}}}%
+\newcommand{hom}{\mathrm{hom}}%
+\newcommand{natto}{\Rightarrow}%{\stackrel{\bullet}{\to}}%
+\newcommand{Id}{\mathrm{Id}}%
+\]</span></p>
+<p>There is a tight relationship between monads and adjunctions. In fact, it is easy to see that every pair of adjoint functors yields a monad. What is really interesting is that conversely, every monad arises by some adjunction.</p>
+<p>Let’s look at an example first. Fix a set <span class="math inline">\(S\)</span>, then there is a natural bijection of hom-sets in the category <span class="math inline">\(\cat{Set}\)</span>:</p>
+<p><span class="math display">\[c: \hom(X\times S, Y)\xrightarrow{\cong}\hom(X, \hom(S, Y))\]</span></p>
+<p>otherwise known as “currying”, taking a function <span class="math inline">\(f : X\times S\to Y\)</span> to a function <span class="math inline">\(c(f) : X\to \hom(S, Y)\)</span> defined by <span class="math inline">\(c(f)(x) = s\mapsto f(x,s)\)</span>. This can be interpreted as an adjunction, where <span class="math inline">\(-\times S\)</span> is the left adjoint to <span class="math inline">\(\hom(S, -)\)</span>. The composition of these functors is the functor <span class="math inline">\(X\mapsto \hom(S, X\times S)\)</span>, which you might recognize as the <code>State</code> monad. In fact, every adjunction yields a monad.</p>
+<h1 id="adjoint-functors">Adjoint functors</h1>
+<p>We recall the definition of an adjoint pair of functors and some properties (without proof.) Let <span class="math inline">\(C\)</span>, <span class="math inline">\(D\)</span> be categories, <span class="math inline">\(F: C\to D\)</span> and <span class="math inline">\(G: D\to C\)</span> be a pair of functors. Then <span class="math inline">\(F\)</span>, <span class="math inline">\(G\)</span> is called an <em>adjoint pair</em> if there is a natural bijection</p>
+<p><span class="math display">\[\Phi_{XY} : \hom_D(FX, Y)\xrightarrow{\cong}\hom_C(X, GY).\]</span></p>
+<p>We call <span class="math inline">\(F\)</span> the <em>left-adjoint</em> and <span class="math inline">\(G\)</span> the <em>right-adjoint</em>, and we write <span class="math inline">\(F\dashv G\)</span>.</p>
+<p>An adjunction comes with natural transformations, <span class="math inline">\(\eta: GF\natto\Id\)</span>, the <em>unit</em> of the adjunction, and <span class="math inline">\(\varepsilon : \Id\natto FG\)</span>, the <em>counit</em>. These arise as follows:</p>
+<p><span class="math display">\[\eta_X = \Phi_{X,FX}(\id_{FX}) : X\to GFX,\]</span></p>
+<p><span class="math display">\[\varepsilon_Y = \Phi_{GY,Y}^{-1}(\id_{GY}) : FGY\to Y,\]</span></p>
+<p>and they satisy so-called triangle equalities given by the following commuting diagrams:</p>
+<p><span class="math display">\[\require{AMScd}
+\begin{CD}
+F\circ\Id_C @&gt;{F\bullet\eta}&gt;&gt; F\circ G\circ F\\
+@| @V{\varepsilon\bullet F}VV\\
+F @= \Id_D\circ F
+\end{CD}\]</span></p>
+<p><span class="math display">\[\begin{CD}
+\Id_C\circ G @&gt;{\eta\bullet G}&gt;&gt; G\circ F\circ G\\
+@| @V{G\bullet \varepsilon}VV\\
+G @= G\circ \Id_D
+\end{CD}\]</span></p>
+<p>(Forgive me if these don’t show up as actual triangles due to technical limitations.)</p>
+<p>With these, we can write <span class="math inline">\(\Phi\)</span> in terms of <span class="math inline">\(\eta\)</span> and <span class="math inline">\(\varepsilon\)</span>:</p>
+<p><span class="math display">\[\begin{align*}
+\Phi_{XY}(f : FX\to Y) &amp;= G(f)\circ\eta_X &amp;: X \xrightarrow{\eta_X} GFX \xrightarrow{Gf} GY\\
+\Phi^{-1}_{XY}(g :X\to GY) &amp;= \varepsilon_Y\circ F(g) &amp;: FX \xrightarrow{Fg} FGY \xrightarrow{\varepsilon_Y} Y
+\end{align*}\]</span></p>
+<p>This will come in handy later.</p>
+<h1 id="monads-from-adjunctions">Monads from adjunctions</h1>
+<p>If we post-compose the first triangle diagram with <span class="math inline">\(G\)</span> and pre-compose the second with <span class="math inline">\(F\)</span>, we obtain a very familiar diagram:</p>
+<p><span class="math display">\[\begin{CD}
+\Id_C\circ GF @&gt;{\eta\bullet GF}&gt;&gt; GFGF @&lt;{GF\bullet\eta}&lt;&lt; GF\circ\Id_C\\
+@| @V{G\bullet\varepsilon\bullet F}VV @|\\
+GF @= GF @= GF
+\end{CD}\]</span></p>
+<p>Setting <span class="math inline">\(M := G\circ F\)</span> and <span class="math inline">\(\mu := G\bullet\varepsilon\bullet F\)</span> results in the diagram for the left and right identities for monads (where <span class="math inline">\(\eta\)</span> is the same.) To see that associativity holds, first recall the horizontal composition <span class="math inline">\(\varepsilon\bullet\varepsilon : FGFG\natto\Id_D\)</span>. It was defined as the diagonal of this commuting diagram:</p>
+<p><span class="math display">\[\begin{CD}
+FGFG @&gt;{FG\bullet\varepsilon}&gt;&gt; FG\circ\Id_D\\
+@V{\varepsilon\bullet FG}VV  @V{\varepsilon\bullet\Id_D}VV\\
+\Id_D\circ FG @&gt;{\Id_D\bullet\varepsilon}&gt;&gt; \Id_D\circ\Id_D
+\end{CD}\]</span></p>
+<p>Post-compose with <span class="math inline">\(G\)</span> and pre-compose with <span class="math inline">\(F\)</span>, similar to what we did before:</p>
+<p><span class="math display">\[\begin{CD}
+GFGFGF    @&gt;{GFG\bullet\varepsilon\bullet F}&gt;&gt;                GFGF\\
+@V{G\bullet\varepsilon\bullet FGF}VV         @V{G\bullet\varepsilon \bullet F}VV\\
+GFGF      @&gt;{G\bullet\varepsilon\bullet F}&gt;&gt;                   GF
+\end{CD}
+\quad
+\sim
+\quad
+\begin{CD}MMM     @&gt;{M\bullet\mu}&gt;&gt;        MM\\
+@V{\mu\bullet M}VV                        @V{\mu}VV\\
+MM                     @&gt;{\mu}&gt;&gt;            M
+\end{CD}\]</span></p>
+<p>This is exactly the associativity diagram we need.</p>
+<p>Conclusion so far: Every adjunction yields a monad.</p>
+<p>There’s a dual statement included that I won’t go into in this article. Every adjunction also yields a comonad <span class="math inline">\(W = F\circ G\)</span>, with the given <span class="math inline">\(\varepsilon: \Id\natto W\)</span> and <span class="math inline">\(\Delta = F\bullet\eta\bullet G : W\natto WW\)</span>.</p>
+<p>Let’s see about the converse statement. Does every monad come from an adjunction?</p>
+<h1 id="adjunctions-from-monads">Adjunctions from monads</h1>
+<p>There are two very different <em>canonical</em> ways to find an adjoint pair that form a monad. In the following, let <span class="math inline">\((M,\eta,\mu)\)</span> be a monad in a category <span class="math inline">\(C\)</span>.</p>
+<h2 id="the-kleisli-category">The Kleisli category</h2>
+<p>Let <span class="math inline">\(C_M\)</span> be the category whose objects are exactly the objects of <span class="math inline">\(C\)</span>, and whose arrows from <span class="math inline">\(a\)</span> to <span class="math inline">\(b\)</span> are exactly the <span class="math inline">\(C\)</span>-morphisms <span class="math inline">\(a\to M(b)\)</span>. To avoid confusion, we’re going to write <span class="math inline">\(a\to_M b\)</span> for the arrows in <span class="math inline">\(C_M\)</span> and <span class="math inline">\(a\to b\)</span> for arrows in <span class="math inline">\(C\)</span>. This way, an arrow <span class="math inline">\(a\to M(b)\)</span> is the same as an arrow <span class="math inline">\(a\to_M b\)</span>.</p>
+<p>Given arrows <span class="math inline">\(f: a\to M(b)\)</span>, <span class="math inline">\(g: b\to M(c)\)</span>, an arrow <span class="math inline">\(g\circ_M f: a\to M(c)\)</span> is given by the <em>Kleisli composition</em>, <span class="math inline">\(g\circ_M f := \mu_c\circ M(g)\circ f\)</span>.</p>
+<p><span class="math display">\[ g\circ_M f := a\stackrel{f}\longrightarrow
+M(b)\stackrel{M(g)}{\longrightarrow} MM(c)\stackrel{\mu_c}{\to} M(c)\]</span></p>
+<p>We check that this gives us a valid composition.</p>
+<ol style="list-style-type: decimal">
+<li><p><span class="math inline">\(\eta_b\circ_M f = \mu_b\circ M(\eta_b)\circ f = f\)</span>, because <span class="math inline">\(\mu\circ(M\bullet\eta) = \id_M\)</span> (this is the <em>right</em> identity law for monads.)</p></li>
+<li><p><span class="math inline">\(f\circ_M\eta_a = \mu_b\circ M(f)\circ\eta_a = \mu_b\circ\eta_{Mb}\circ f = f\)</span> by naturality and because <span class="math inline">\(\mu\circ(\eta\bullet M) =\id_M\)</span> (this is the <em>left</em> identity law.)</p></li>
+<li><p>Let <span class="math inline">\(h:c\to_M d\)</span> be another arrow. Then</p></li>
+</ol>
+<p><span class="math display">\[\begin{align*}
+h\circ_M(g\circ_M f) &amp;= h\circ_M(\mu_c\circ M(g)\circ f)\\
+&amp;= \mu_d\circ \underline{M(h) \circ \mu_c}\circ M(g)\circ f\\
+&amp;= \underline{\mu_d\circ\mu_{Md}}\circ MM(h)\circ M(g)\circ f\\
+&amp;= \mu_d\circ M(\mu_d)\circ MM(h)\circ M(g)\circ f\\
+&amp;= \mu_d\circ M(\mu_d\circ M(h)\circ g)\circ f\\
+&amp;= (h\circ_M g)\circ_M f,\end{align*}\]</span></p>
+<p>by naturality and the associative law of monads.</p>
+<p>We see that, indeed, <span class="math inline">\(C_M\)</span> is a category, where the composition is given by <span class="math inline">\(\circ_M\)</span>, and the identity associated with an object <span class="math inline">\(a\)</span> is <span class="math inline">\(\eta_a\)</span>. This category is called the <em>Kleisli category</em> of <span class="math inline">\(M\)</span>.</p>
+<p>Notation: The Kleisli composition is often written an operator like <code>&lt;=&lt;</code>, there’s a flipped form <code>&gt;=&gt;</code> called the “Kleisli fish”.</p>
+<h2 id="the-kleisli-adjunction">The Kleisli adjunction</h2>
+<p>Let’s introduce two functors, <span class="math inline">\(F: C\to C_M\)</span> and <span class="math inline">\(G: C_M\to C\)</span>. On objects, <span class="math inline">\(F\)</span> maps each object to itself (remember that the objects of <span class="math inline">\(C_M\)</span> are precisely the objects of <span class="math inline">\(C\)</span>). On morphisms then, <span class="math inline">\(F\)</span> must map <span class="math inline">\(f: a\to b\)</span> to <span class="math inline">\(F(f) : a\to_M b\)</span>, that is, a morphism <span class="math inline">\(a\to M(b)\)</span>. We can accomplish that by post-composing with an <span class="math inline">\(\eta\)</span>, so we have <span class="math inline">\(F(f) := \eta_b \circ f: a\to M(b)\)</span>.</p>
+<p><span class="math inline">\(f:a\to b\quad\leadsto\quad F(f): a\xrightarrow{f} b\xrightarrow{\eta_b} M(b)\)</span></p>
+<p>The other functor, <span class="math inline">\(G\)</span>, can’t just go back, because there’s no general way to obtain a morphism <span class="math inline">\(a\to b\)</span> from <span class="math inline">\(a\to M(b)\)</span>. We cannot “unpack” monads, but we can “flatten”. So we define <span class="math inline">\(G(a) = M(a)\)</span> on objects, and <span class="math inline">\(G(f:a\to M(b)) = \mu_b \circ M(f)\)</span>.</p>
+<p><span class="math inline">\(f: a\to M(b)\quad\leadsto\quad G(f): M(a)\xrightarrow{M(f)} MM(b)\xrightarrow{\mu_b} M(b)\)</span>.</p>
+<p>To show that they are adjoint, observe that a <span class="math inline">\(C\)</span>-morphism <span class="math inline">\(f: a\to M(b)\)</span> is simultaneously a morphism <span class="math inline">\(a\to_M b\)</span> in <span class="math inline">\(C_M\)</span>, so with our functors, it’s <span class="math inline">\(F(a)\to_M b\)</span> and <span class="math inline">\(a\to G(b)\)</span> at the same time. This means that the hom-set bijection is actually an identity.</p>
+<p><span class="math display">\[\begin{align*}
+\Phi_{ab} : \hom_{C_M}(Fa, b) &amp;\xrightarrow{\cong} \hom_C(a, Gb)\\
+f&amp;\mapsto f
+\end{align*}\]</span></p>
+<p>What could be more natural than an identity? But not so fast, let’s do this carefully. To show that <span class="math inline">\(\Phi_{ab}\)</span> is natural, we have to show that both composition rules “make sense”. First, let <span class="math inline">\(f: c\to a\)</span> be a morphism in <span class="math inline">\(C\)</span>. Then <span class="math inline">\(\hom_{C_M}(Ff, b)\)</span> is precomposition with <span class="math inline">\(Ff\)</span>, that is, for <span class="math inline">\(\varphi \in\hom_{C_M}(Fa, b)\)</span>, we have <span class="math inline">\(\hom_{C_M}(Ff, b)(\varphi) = \varphi\circ_M Ff = \mu_b\circ M(\varphi)\circ\eta_a\circ f = \mu_b\circ\eta_{Mb}\circ\varphi\circ f = \varphi\circ f = \hom_C(f, Gb)(\varphi)\)</span> by naturality of <span class="math inline">\(\eta\)</span> and the left identity law. For the other variable it is much easier, with <span class="math inline">\(g: b\to_M c\)</span>, <span class="math inline">\(\hom_{C_M}(Fa, g)(\varphi) = g\circ_M\varphi = \mu_c\circ M(g)\circ\varphi = \hom_C(a, Gg)(\varphi)\)</span> for <span class="math inline">\(\varphi : a\to M(b)\)</span>.</p>
+<h2 id="eilenberg-moore-algebras">Eilenberg-Moore algebras</h2>
+<p>An <span class="math inline">\(M\)</span>-algebra (also called an Eilenberg-Moore algebra) is a pair <span class="math inline">\((a, h)\)</span> of an object <span class="math inline">\(a\in C\)</span> and an arrow <span class="math inline">\(h: Ma\to a\)</span>, such that the following diagrams commute:</p>
+<p><span class="math display">\[
+\begin{CD}
+MMa @&gt;{Mh}&gt;&gt; Ma \\
+@V{\mu_a}VV @VhVV\\
+Ma @&gt;h&gt;&gt; a
+\end{CD}\]</span></p>
+<p>and</p>
+<p><span class="math display">\[\begin{CD}
+a @&gt;{\eta_a}&gt;&gt; Ma\\
+@| @VhVV\\
+a @= a
+\end{CD}\]</span></p>
+<p>A morphism between two <span class="math inline">\(M\)</span>-algebras, <span class="math inline">\((a, f: Ma\to a)\)</span> and <span class="math inline">\((b, g: Mb\to b)\)</span> is a <span class="math inline">\(C\)</span>-morphism <span class="math inline">\(h: a\to b\)</span> which is compatible with the two algebras in the sense that the following diagram commutes:</p>
+<p><span class="math display">\[\begin{CD}
+Ma @&gt;f&gt;&gt; a\\
+@V{Mh}VV  @VhVV \\
+Mb @&gt;g&gt;&gt; b
+\end{CD}\]</span></p>
+<p>(One could also say that a diagram like this <em>is</em> a morphism in <span class="math inline">\(C^M\)</span>.) The morphisms compose in an obvious way and we have the obvious identities, so <span class="math inline">\(C^M\)</span> is a category, the <em>Eilenberg-Moore category</em> of <span class="math inline">\(M\)</span>.</p>
+<h3 id="some-examples">Some examples</h3>
+<p>In general, it is not clear for a given object <span class="math inline">\(A\in C\)</span> that an <span class="math inline">\(M\)</span>-algebra <span class="math inline">\(MA\to A\)</span> even exists. For a simple example, if <span class="math inline">\(M\)</span> is the <code>Maybe</code> monad, then there does not exist an <span class="math inline">\(M\)</span>-algebra <span class="math inline">\(h: M(\emptyset)\to\emptyset\)</span>, because <span class="math inline">\(h(\mathsf{Nothing})\in\emptyset\)</span> is a contradiction. It turns out that there is a 1:1 correspondence in this case between <span class="math inline">\(M\)</span>-algebras <span class="math inline">\(h: MA\to A\)</span> and <em>pointed sets</em> <span class="math inline">\((A, a_0\in A)\)</span> via</p>
+<p><span class="math display">\[h(a) = \begin{cases}a\text{ if }a\in A\\a_0\text{ if
+}a = \mathsf{Nothing}\end{cases}.\]</span></p>
+<p>(<span class="math inline">\(h\)</span> must send everything in <span class="math inline">\(A\)</span> to itself due to the condition <span class="math inline">\(h\circ\eta_A = \id_A\)</span>.)</p>
+<p>If we take the list monad <span class="math inline">\(L\)</span>, then there is a 1:1 correspondence between <span class="math inline">\(L\)</span>-algebras <span class="math inline">\(h: LA\to A\)</span> and monoids <span class="math inline">\((A,\diamond, e)\)</span>, by <span class="math inline">\(h([a_1,\ldots,a_n]) = a_1\diamond\cdots\diamond a_n\)</span>.</p>
+<p>Interestingly, the list functor is the free functor to monoids, and the maybe functor is the free functor to pointed sets. I’m sure this isn’t an accident.</p>
+<h2 id="the-eilenberg-moore-adjunction">The Eilenberg-Moore adjunction</h2>
+<p>Let’s again define a pair of functors, <span class="math inline">\(F: C\to C^M\)</span> and <span class="math inline">\(G: C^M\to C\)</span>. The functor <span class="math inline">\(F\)</span> must send an object <span class="math inline">\(a\in C\)</span> to an <span class="math inline">\(M\)</span>-algebra, preferably one that is somehow connected with <span class="math inline">\(a\)</span>. But this is difficult in general, as the previous section showed. Fortunately, there is a canonical choice one more <span class="math inline">\(M\)</span> away: <span class="math inline">\(\mu_a : MMa\to Ma\)</span> automatically satisfies the conditions for an <span class="math inline">\(M\)</span>-algebra, so we set <span class="math inline">\(F(a) = (Ma, \mu_a)\)</span>, the required conditions</p>
+<p><span class="math display">\[\begin{CD}
+Ma @&gt;{\eta_{Ma}}&gt;&gt; MMa\\
+@|                 @V{\mu_a}VV\\
+Ma @=              Ma
+\end{CD}\]</span></p>
+<p>and</p>
+<p><span class="math display">\[\begin{CD}
+MMMa @&gt;{M\mu_a}&gt;&gt; MMa\\
+@V{\mu_{Ma}}VV    @V{\mu_a}VV\\
+MMa @&gt;{\mu_a}&gt;&gt; Ma
+\end{CD}\]</span></p>
+<p>are exactly the left identity and the associativity condition of the monad <span class="math inline">\(M\)</span>.</p>
+<p>A morphism <span class="math inline">\(f:a\to b\)</span> must then be sent to a morphism <span class="math inline">\(F(f): (Ma,\mu_a)\to(Mb,\mu_b)\)</span>, we set <span class="math inline">\(F(f) = M(f)\)</span>:</p>
+<p><span class="math display">\[
+f : a\to b\quad\leadsto\quad
+\begin{CD}
+MMa @&gt;{\mu_a}&gt;&gt; Ma\\
+@V{MMf}VV      @V{Mf}VV\\
+MMb @&gt;{\mu_b}&gt;&gt; Mb
+\end{CD}\]</span></p>
+<p>By naturality, this diagram always commutes.</p>
+<p>The functor <span class="math inline">\(G\)</span> is simpler, an object <span class="math inline">\(g: Ma\to a\)</span> is sent to <span class="math inline">\(a\)</span>, a morphism <span class="math inline">\(h: (a,f:Ma\to a)\to(b,g:Mb\to b)\)</span> is sent to the arrow <span class="math inline">\(h:a\to b\)</span>. So <span class="math inline">\(G\)</span> is like a <em>forgetful</em> functor, it simply forgets structure.</p>
+<p>We now construct a bijection</p>
+<p><span class="math display">\[\Psi_{a,(b,g)}: \hom_{C^M}(Fa, (b,g))\xrightarrow{\cong}\hom_C(a,G(b,g))\]</span></p>
+<p>Let <span class="math inline">\(h: Fa=(Ma,\mu_a) \to (b,g)\)</span> be a morphism in <span class="math inline">\(C^M\)</span>. We ignore the compatibility condition and just focus on the part <span class="math inline">\(h: Ma\to b\)</span>. By precomposing with <span class="math inline">\(\eta_a\)</span>, we obtain a morphism <span class="math inline">\(a\to b\)</span>, or <span class="math inline">\(a\to G(b,g)\)</span>, so we can set <span class="math inline">\(\Psi(h) = h\circ\eta_a\)</span>.</p>
+<p><span class="math display">\[\Psi_{a, (b,g)}\left (
+\begin{CD}
+MMa @&gt;{\mu_a}&gt;&gt; Ma\\
+@V{Mh}VV        @V{h}VV\\
+Mb @&gt;{g}&gt;&gt;      b
+\end{CD}
+\right ) = \begin{CD} a @&gt;{\eta_a}&gt;&gt; Ma @&gt;{h}&gt;&gt; b \end{CD}\]</span></p>
+<p>The inverse is not as easy, because we’re given any old morphism <span class="math inline">\(k: a\to b = G(b,g:Mb\to b)\)</span> in <span class="math inline">\(C\)</span> and have to make up structure to form a commutative diagram. But we can do it:</p>
+<p><span class="math display">\[\Psi_{a, (b,g)}^{-1}(k : a\to b) =
+\begin{CD}
+MMa @&gt;{\mu_a}&gt;&gt; Ma\\
+@V{MMk}VV       @V{Mk}VV\\
+MMb %@&gt;{\mu_b}&gt;&gt;
+@. Mb\\
+@V{Mg}VV        @V{g}VV\\
+Mb @&gt;{g}&gt;&gt;      b
+\end{CD}\]</span></p>
+<p>So we’re just setting <span class="math inline">\(\Psi^{-1}(k) = g\circ M(k)\)</span>. If we insert <span class="math inline">\(\mu_b : MMb\to Mb\)</span> in the middle, we see that the upper square commutes by naturality, the lower by the fact that <span class="math inline">\(g\)</span> is an <span class="math inline">\(M\)</span>-algebra.</p>
+<p>Now I wrote <span class="math inline">\(\Psi^{-1}\)</span> without checking that this is actually the inverse of <span class="math inline">\(\Psi\)</span>. Let’s quickly make up for that. Using the notation of the previous paragraphs, <span class="math inline">\(\Psi^{-1}(\Psi(h: Ma\to b)) = \Psi^{-1}(h\circ\eta_a) = g\circ M(h\circ\eta_a) = h\circ\mu_a\circ M(\eta_a) = h\)</span>, where we used the fact that <span class="math inline">\(h\)</span> is a morphism of <span class="math inline">\(M\)</span>-algebras and the right identity law for monads, and <span class="math inline">\(\Psi(\Psi^{-1}(k:a\to b)) = \Psi(g\circ M(k)) = g\circ M(k)\circ \eta_a = g\circ \eta_b\circ k = k\)</span> by naturality of <span class="math inline">\(\eta\)</span> and the fact that <span class="math inline">\(g\)</span> is an <span class="math inline">\(M\)</span>-algebra.</p>
+<p>The last thing to check is naturality. In the first variable: Let <span class="math inline">\(f : c\to a\)</span> be a morphism, then <span class="math inline">\(\hom_{C^M}(Ff, (g,b))(h) = h\circ Mf\)</span>, which is sent to <span class="math inline">\(h\circ Mf\circ\eta_c = h\circ\eta_a\circ f\)</span> due to naturality, which is just <span class="math inline">\(\hom_C(f, G(g,b))(\Psi(h))\)</span>. In the second variable: Let <span class="math inline">\(f : (b,g)\to(c,h)\)</span> be a morphism in <span class="math inline">\(C^M\)</span>. Then obviously <span class="math inline">\(\Psi(\hom_{C^M}(Fa, f)(h)) = \eta_a\circ h\circ f = \hom_C(a, Gf)(\Psi(h))\)</span>.</p>
+<h1 id="the-category-of-adjunctions-that-form-a-given-monad">The category of adjunctions that form a given monad</h1>
+<p>There can be many adjunctions that form a given monad <span class="math inline">\(M\)</span>. Let’s call them <span class="math inline">\(M\)</span>-adjunctions. To relate them, the elementary idea of category theory tells us: Look for the morphisms!</p>
+<p>Let us denote an <span class="math inline">\(M\)</span>-adjunction consisting of <span class="math inline">\(F:C\to D\)</span> and <span class="math inline">\(G: D\to C\)</span> by the triple <span class="math inline">\((D, F, G)\)</span>. <span class="math inline">\(C\)</span> is implicit, since <span class="math inline">\(M\)</span> is an endofunctor of <span class="math inline">\(C\)</span>. A morphism of <span class="math inline">\(M\)</span>-adjunctions <span class="math inline">\((D_1, F_1, G_1)\to (D_2, F_2, G_2)\)</span> is a functor <span class="math inline">\(K: D_1\to D_2\)</span> such that the following diagram commutes:</p>
+<p><span class="math display">\[\begin{CD}
+C @&gt;{F_1}&gt;&gt; D_1 @&gt;{G_1}&gt;&gt; C\\
+@|          @V{K}VV       @|\\
+C @&gt;{F_2}&gt;&gt; D_2 @&gt;{G_2}&gt;&gt; C
+\end{CD}\]</span></p>
+<p>that is, we require <span class="math inline">\(F_2=K\circ F_1\)</span> and <span class="math inline">\(G_1 = G_2\circ K\)</span>. These morphisms compose in an obvious way, so we obtain the category of <span class="math inline">\(M\)</span>-adjunctions, <span class="math inline">\(\mathcal A_M\)</span>.</p>
+<p>The rest of the article will be dedicated to showing the roles of the Kleisli and the Eilenberg-Moore adjunction in this category, and to illustrate the findings on our initial <code>State</code> example.</p>
+<h3 id="theorem">Theorem:</h3>
+<p>Let <span class="math inline">\((M,\eta,\mu)\)</span> be a monad on a category <span class="math inline">\(C\)</span>, and let <span class="math inline">\(\mathcal A_M\)</span> be the category of <span class="math inline">\(M\)</span>-adjunctions.</p>
+<ol style="list-style-type: decimal">
+<li><p>The Kleisli adjunction <span class="math inline">\((C_M, F_M, G_M)\)</span> is an initial object in <span class="math inline">\(\mathcal A_M\)</span>.</p></li>
+<li><p>The Eilenberg-Moore adjunction <span class="math inline">\((C^M, F^M, G^M)\)</span> is a terminal object in <span class="math inline">\(\mathcal A_M\)</span>.</p></li>
+</ol>
+<h4 id="proof">Proof:</h4>
+<p>Let <span class="math inline">\((D, F, G)\)</span> be an <span class="math inline">\(M\)</span>-adjunction, given by <span class="math inline">\(\Phi:\hom_C(FX,Y)\cong\hom_D(X,GY)\)</span>.</p>
+<ol style="list-style-type: decimal">
+<li>We define a functor <span class="math inline">\(K:C_M\to D\)</span> such that <span class="math inline">\(K\circ F_M = F\)</span>: Since <span class="math inline">\(F_M\)</span> acts as the identity on objects, we have no choice but to set <span class="math inline">\(K(a) = F(a)\)</span>. On morphisms <span class="math inline">\(f: a\to M(b)\)</span>, we set <span class="math inline">\(K(f) = \varepsilon_{Fb}\circ F(f)\)</span>.</li>
+</ol>
+<p>First, we show the functor laws. The identity corresponding to an object <span class="math inline">\(a\)</span> in the Kleisli category is <span class="math inline">\(\eta_a : a\to_M a\)</span>, and <span class="math inline">\(K(\eta_a) = \varepsilon_{Fa}\circ F(\eta_a) = \id_{Fa}\)</span> by the triangle equations, so <span class="math inline">\(K\)</span> preserves identities. If <span class="math inline">\(f:a\to M(b)\)</span> and <span class="math inline">\(g: b\to M(c)\)</span> are Kleisli arrows,</p>
+<p><span class="math display">\[\begin{align*}
+K(g\circ_M f) &amp;= \varepsilon_{Fc}\circ F(\mu_c\circ M(g)\circ f)\\
+&amp;= \underline{\varepsilon_{Fc}\circ FG\varepsilon_{Fc}}\circ FGFg \circ Ff\\
+&amp;= \varepsilon_{Fc}\circ \underline{\varepsilon_{FGFc}\circ FGFg} \circ Ff\\
+&amp;= \varepsilon_{Fc}\circ Fg\circ \varepsilon_{Fb}\circ Ff\\
+&amp;= K(g) \circ K(f),
+\end{align*}\]</span></p>
+<p>by the diagram associated with <span class="math inline">\(\varepsilon\bullet\varepsilon\)</span> and naturality.</p>
+<p>Now we’ve already seen <span class="math inline">\(K(F_M(a)) = F(a)\)</span> for objects <span class="math inline">\(a\)</span>, and for <span class="math inline">\(f:a\to b\)</span>, we have <span class="math inline">\(K(F_M(f)) = K(\eta_a\circ f) = \varepsilon_{Fb}\circ F(\eta_a)\circ F(f) = F(f)\)</span> by the triangle equality.</p>
+<p>Also, <span class="math inline">\(G(K(a)) = G(F(a)) = M(a) = G_M(a)\)</span>, and if <span class="math inline">\(f: a\to_M b\)</span> is a morphism in <span class="math inline">\(C_M\)</span>, <span class="math inline">\(G(K(f)) = G(\varepsilon_{Fb}\circ F(f)) = G(\varepsilon_{Fb})\circ M(f) = \mu_b\circ M(f) = G_M(f)\)</span>.</p>
+<p>It remains to show that the action of <span class="math inline">\(K\)</span> on morphisms of <span class="math inline">\(C_M\)</span> is uniquely determined. Let <span class="math inline">\(L\)</span> be another functor <span class="math inline">\(C_M\to D\)</span> such that <span class="math inline">\(G\circ L = G_M\)</span> and which satisfies <span class="math inline">\(L(a) = F(a)\)</span> on objects. We’re going to use the interplay between <span class="math inline">\(\Phi\)</span>, <span class="math inline">\(\eta\)</span> and <span class="math inline">\(\varepsilon\)</span> now. For a <span class="math inline">\(C_M\)</span>-morphism <span class="math inline">\(f: a\to_M b\)</span>, we have <span class="math inline">\(G(L(f)) = G(K(f))\)</span>, hence <span class="math inline">\(G(L(f))\circ\eta_a = G(K(f))\circ\eta_a\)</span>. We can rewrite both sides in terms of <span class="math inline">\(\Phi\)</span>: <span class="math inline">\(\Phi_{a,Fb}(L(f)) = \Phi_{a,Fb}(K(f))\)</span>, from which follows <span class="math inline">\(L(f) = K(f)\)</span>, because <span class="math inline">\(\Phi_{a,Fb}\)</span> is a bijection. We conclude that <span class="math inline">\(L=K\)</span>.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>We define a functor <span class="math inline">\(T: D\to C^M\)</span> such that <span class="math inline">\(T\circ F = F^M\)</span> and <span class="math inline">\(G^M\circ T = G\)</span>. Since <span class="math inline">\(T(FX) = F^M(X) = (MX, \mu_X) = (GFX, G(\varepsilon_{FX}))\)</span>, an obvious choice is <span class="math inline">\(T(Y) = (GY, G(\varepsilon_Y))\)</span>. This also satisfies <span class="math inline">\(G^M(TY) = GY\)</span>.</li>
+</ol>
+<p>For a morphism <span class="math inline">\(f:X\to Y\)</span> in <span class="math inline">\(D\)</span>, <span class="math inline">\(T(f)\)</span> is a morphism in the Eilenberg-Moore category between the free <span class="math inline">\(M\)</span>-algebras <span class="math inline">\(T(X)\)</span> and <span class="math inline">\(T(Y)\)</span>, but as <span class="math inline">\(G^M\)</span> is a forgetful functor, the condition <span class="math inline">\(G^M(Tf) = G(f)\)</span> forces <span class="math inline">\(T(f) = G(f)\)</span>.</p>
+<p><span class="math display">\[\begin{CD}
+MG(X)   @&gt;{G(\varepsilon_X)}&gt;&gt;   G(X)\\
+@V{MG(f)}VV                    @V{G(f)}VV\\
+MG(Y)   @&gt;{G(\varepsilon_Y)}&gt;&gt;   G(Y)
+\end{CD}
+\quad\leadsto\quad
+\begin{CD}
+G(X)\\ @V{G(f)}VV \\ G(Y)
+\end{CD}\]</span></p>
+<p>The remainder of the proof is dedicated to showing that <span class="math inline">\(T\)</span> is uniquely determined. It is clear that we had no choice in the definition of <span class="math inline">\(T(Y)\)</span> for objects <span class="math inline">\(Y\)</span> in the image of <span class="math inline">\(F\)</span>, neither did we have a choice in the definition of <span class="math inline">\(T(f)\)</span>. It is not yet clear that <span class="math inline">\(T(Y)\)</span> must be <span class="math inline">\((GY, G(\varepsilon_Y))\)</span> in general. This has to do with the seemingly arbitrary choice of <span class="math inline">\(\mu_X\)</span> as the “free <span class="math inline">\(M\)</span>-algebra” <span class="math inline">\(F^M(X)\)</span>. Just because we can’t think of anything else right away doesn’t mean it’s unique.</p>
+<p>We proceed in three steps. First, the following diagram is commutative for all <span class="math inline">\(X\in C\)</span>, <span class="math inline">\(Y\in D\)</span>:</p>
+<p><span class="math display">\[\begin{CD}
+\hom_D(FX, Y) @&gt;{\Phi_{XY}}&gt;&gt; \hom_C(X, GY)\\
+@V{T_{FX,Y}}VV                       @|\\
+\hom_{C^M}(F^MX, TY)  @&gt;{\Phi^M_{X,TY}}&gt;&gt; \hom_C(X, GY)
+\end{CD}\]</span></p>
+<p>Here, <span class="math inline">\(T_{FX,Y}\)</span> denotes the action of <span class="math inline">\(T\)</span> on morphisms, <span class="math inline">\(\hom_D(FX,Y)\to\hom_{C^M}(TFX, TY),\,f\mapsto T(f)\)</span>. Keep in mind that <span class="math inline">\(TFX = F^MX\)</span> and <span class="math inline">\(G^MTY = GY\)</span>.</p>
+<p>To see that this is true, realize that <span class="math inline">\(\Phi_{XY}(f) = G(f)\circ\eta_X\)</span> and <span class="math inline">\(\Phi^M_{X,TY}(T(f)) = G^M(T(f))\circ\eta_X = G(f)\circ\eta_X\)</span>, too.</p>
+<p>Second, recall that the counit <span class="math inline">\(\varepsilon\)</span> arises as the image of the identity under the inverse adjunction. Thus <span class="math inline">\(\Phi^M_{GY,TY}(T(\varepsilon_Y)) = \Phi_{GY,Y}(\varepsilon_Y) = \id_{GY} = \id_{G^M(TY)}\)</span>, therefore <span class="math inline">\(T(\varepsilon_Y) = (\Phi^M_{GY,TY})^{-1}(\id_{G^M(TY)}) = \varepsilon^M_{TY}\)</span>, for all <span class="math inline">\(Y\in D\)</span>.</p>
+<p>Third, <span class="math inline">\(\varepsilon^M_{(A,h)} = h\)</span> in general, so the structure morphism of <span class="math inline">\(T(Y)\)</span> is <span class="math inline">\(\varepsilon^M_{T(Y)} = T(\varepsilon_Y) = G(\varepsilon_Y)\)</span>, for all <span class="math inline">\(Y\in D\)</span>.</p>
+<p>This concludes the proof.</p>
+<h1 id="example-decomposing-the-state-monad">Example: Decomposing the <code>State</code> monad</h1>
+<h1 id="notes">Notes</h1>
+<ul>
+<li>In fact, the currying adjunction is the only adjunction inside <span class="math inline">\(\cat{Set}\)</span> and the <code>State</code> monad is the only monad that is formed in this way (up to isomorphism.) We’re going to look at this issue in another article.</li>
+</ul>
+<p>TODO Unify notation. Objects <span class="math inline">\(a\)</span> vs. <span class="math inline">\(X\)</span>? Adjunctions <span class="math inline">\(\Phi^M\)</span> instead of <span class="math inline">\(\Psi\)</span>.</p>
+<p>TODO Think of a better way to denote an object of <span class="math inline">\(\mathcal A_M\)</span>.</p>
+    </section>
+</article>
+
+        </main>
+
+        <footer>
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </footer>
+    </body>
+</html>

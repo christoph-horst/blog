@@ -212,7 +212,7 @@ join mma = mma &gt;&gt;= id</code></pre>
 \end{align*}\]</span></p></li>
 </ol>
 <p>where we used law 3. This shows the <em>associative law</em>, <span class="math inline">\(\mu\circ(M\bullet\mu) = \mu\circ(\mu\bullet M)\)</span>.</p>
-<p>Notes:</p>
+<h1 id="notes">Notes</h1>
 <ul>
 <li><p>I have completely ignored the issue of naturality of <code>return</code>, <code>&gt;&gt;=</code> and <code>join</code>. According to the definition, these functions should be natural transformations. We don’t have to worry, however, because due to parametric polymorphism it is indeed impossible to write a function <code>h :: F a -&gt; G a</code> between functors <code>F</code> and <code>G</code> that is not a natural transformation. There is a whole class of such theorems, which go under the slogan “Theorems for free”, among them: the only (total) function <code>a -&gt; a</code> is the identity, and if a type of kind <code>*   -&gt; *</code> can be a <code>Functor</code> at all, it has a unique instance. I plan to write an article about this topic later.</p></li>
 <li><p>The monad laws can be more elegantly put in terms of <em>Kleisli composition</em>, which is simultaneously easily understood as the composition in a special category and easily defined in terms of “bind”. This results in an interpretation of “bind” as some kind of “Kleisli application”, so our intuitions about normal function application and composition directly carry over. But this topic deserves its own article.</p></li>
