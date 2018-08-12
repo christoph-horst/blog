@@ -16,38 +16,17 @@
             <nav>
                 <a href="./">Home</a>
                 <a href="./about.html">About</a>
-                <a href="./contact.html">Contact</a>
+                <!--<a href="/contact.html">Contact</a>-->
                 <a href="./archive.html">Archive</a>
             </nav>
         </header>
 
         <main role="main">
             <h1>About</h1>
-            <p>Nullam imperdiet sodales orci vitae molestie. Nunc quam orci, pharetra a rhoncus vitae, eleifend id felis. Suspendisse potenti. Etiam vitae urna orci. Quisque pellentesque dignissim felis, egestas tempus urna luctus vitae. In hac habitasse platea dictumst. Morbi fringilla mattis odio, et mattis tellus accumsan vitae.</p>
-<ol style="list-style-type: decimal">
-<li>Amamus Unicode 碁</li>
-<li>Interdum nex magna.</li>
-<li>Farsi فارسی</li>
-<li>Math <span class="math inline">\(\exp(i\pi) = -1\)</span></li>
-</ol>
-<p>Vivamus eget mauris sit amet nulla laoreet lobortis. Nulla in diam elementum risus convallis commodo. Cras vehicula varius dui vitae facilisis. Proin elementum libero eget leo aliquet quis euismod orci vestibulum. Duis rhoncus lorem consequat tellus vestibulum aliquam. Quisque orci orci, malesuada porta blandit et, interdum nec magna.</p>
-<p>RST = restructured text <a href="http://docutils.sourceforge.net/docs/ref/rst/roles.html#math" class="uri">http://docutils.sourceforge.net/docs/ref/rst/roles.html#math</a> <a href="http://docutils.sourceforge.net/docs/ref/rst/directives.html#code" class="uri">http://docutils.sourceforge.net/docs/ref/rst/directives.html#code</a></p>
-<p><span class="math display">\[\begin{vmatrix}
-a &amp; 0 &amp; 0 &amp; \dots &amp; 0\\
-0 &amp; a &amp; 0 &amp; \dots &amp; 0\\
-\vdots &amp; \vdots &amp; \ddots &amp; &amp; \dots\\
-0 &amp; 0 &amp; 0 &amp; \dots &amp; a
-\end{vmatrix} = a^n\]</span></p>
-<div class="sourceCode"><pre class="sourceCode Haskell"><code class="sourceCode haskell">pandocMathCompiler <span class="fu">=</span>
- <span class="kw">let</span> mathExtensions <span class="fu">=</span> [<span class="dt">Ext_tex_math_dollars</span>, <span class="dt">Ext_tex_math_double_backslash</span>,
-                       <span class="dt">Ext_latex_macros</span>]
-     defaultExtensions <span class="fu">=</span> writerExtensions defaultHakyllWriterOptions
-     newExtensions <span class="fu">=</span> foldr S.insert defaultExtensions mathExtensions
-     writerOptions <span class="fu">=</span> defaultHakyllWriterOptions {
-                       writerExtensions <span class="fu">=</span> newExtensions,
-                       writerHTMLMathMethod <span class="fu">=</span> <span class="dt">MathJax</span> <span class="st">&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js&quot;</span>
-                     }
- <span class="kw">in</span> pandocCompilerWithTransform defaultHakyllReaderOptions writerOptions id</code></pre></div>
+            <p>If you’re reading this, you have probably received a direct link from me to an unpublished article.</p>
+<p>This website will eventually contain articles about functional programming practice and theory that either reflect my learning process or are smaller FAQ-like articles about issues I noticed.</p>
+<p>Maybe it will become a blog, maybe not.</p>
+<p>It is based on Hakyll, the articles are written in Markdown, with <span class="math inline">\(\LaTeX\)</span> support via MathJax.</p>
         </main>
 
         <footer>
