@@ -448,8 +448,7 @@ morphisms compose in an obvious way, so we obtain the category of
 $M$-adjunctions, $\mathcal A_M$.
 
 The rest of the article will be dedicated to showing the roles of the
-Kleisli and the Eilenberg-Moore adjunction in this category, and to
-illustrate the findings on our initial `State` example.
+Kleisli and the Eilenberg-Moore adjunction in this category.
 
 ### Theorem:
 

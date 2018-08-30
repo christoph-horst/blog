@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>My Hakyll Blog - Monads from adjunctions, adjunctions from monads.</title>
         <link rel="stylesheet" href="../css/default.css" />
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     </head>
     <body>
         <header>
@@ -247,7 +247,7 @@ C @&gt;{F_1}&gt;&gt; D_1 @&gt;{G_1}&gt;&gt; C\\
 C @&gt;{F_2}&gt;&gt; D_2 @&gt;{G_2}&gt;&gt; C
 \end{CD}\]</span></p>
 <p>that is, we require <span class="math inline">\(F_2=K\circ F_1\)</span> and <span class="math inline">\(G_1 = G_2\circ K\)</span>. These morphisms compose in an obvious way, so we obtain the category of <span class="math inline">\(M\)</span>-adjunctions, <span class="math inline">\(\mathcal A_M\)</span>.</p>
-<p>The rest of the article will be dedicated to showing the roles of the Kleisli and the Eilenberg-Moore adjunction in this category, and to illustrate the findings on our initial <code>State</code> example.</p>
+<p>The rest of the article will be dedicated to showing the roles of the Kleisli and the Eilenberg-Moore adjunction in this category.</p>
 <h3 id="theorem">Theorem:</h3>
 <p>Let <span class="math inline">\((M,\eta,\mu)\)</span> be a monad on a category <span class="math inline">\(C\)</span>, and let <span class="math inline">\(\mathcal A_M\)</span> be the category of <span class="math inline">\(M\)</span>-adjunctions.</p>
 <ol style="list-style-type: decimal">
