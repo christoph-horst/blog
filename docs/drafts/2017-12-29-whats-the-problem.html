@@ -29,7 +29,8 @@
         
     </section>
     <section>
-        <p><span class="math display">\[\newcommand{cat}{\mathsf}%
+        <div style="display:none;">
+<p><span class="math display">\[\newcommand{cat}{\mathsf}%
 \newcommand{id}{\mathrm{id}}%
 \newcommand{bind}{\mathbin{\mathrm{\gg=}}}%
 \newcommand{kleisli}{\mathbin{\mathrm{&gt;=&gt;}}}%
@@ -37,6 +38,7 @@
 \newcommand{natto}{\stackrel{\bullet}{\to}}%
 \newcommand{Id}{\mathrm{Id}}%
 \]</span></p>
+</div>
 <p>The quote in the title is from James Iry’s <a href="http://james-iry.blogspot.de/2009/05/brief-incomplete-and-mostly-wrong.html">A Brief, Incomplete, and Mostly Wrong History of Programming Languages</a> in which he jokingly attributes the quote to Philip Wadler, one of the inventors of Haskell. Actually it is a slightly modified quote from the influential category theory textbook “Categories for the working mathematician” by Saunders Mac Lane (without the part about problems.) It is passed around in functional programming circles, but nobody ever seems to try to explain what it means in detail. Is it just a joke? Trying to make your head explode? Let’s try to understand what it means.</p>
 <p>For a serious attempt at understanding this quote, you should already kind of know what the individual words mean. You’ve seen the <code>Monad</code> and <code>Monoid</code> type classes in Haskell, you should also have had some exposure to the basics of category theory, in particular functors, natural transformations, and products. You should also know the basics of set theory.</p>
 <p>Nothing in this is new, you can find it in most category theory textbooks; <a href="https://bartoszmilewski.com/">Bartosz Milewski</a> has a <a href="https://bartoszmilewski.com/2016/12/27/monads-categorically/">section about the categorical meaning of monads</a>. There was even a similarly-titled <a href="https://blog.merovius.de/2018/01/08/monads-are-just-monoids.html">blog article by Axel Wagner</a> recently (published while I was writing this), which also explains categories and functors, but leaves out the stuff about monoidal categories. You’re invited to check out these other sources if you get stuck reading this article. If nothing else, this article is just an account of something I learned recently.</p>

@@ -1,7 +1,7 @@
 ---
 title: «A monad is just a monoid in the category of endofunctors, what's the problem?»
 ---
-
+<div style="display:none;">
 $$\newcommand{cat}{\mathsf}%
 \newcommand{id}{\mathrm{id}}%
 \newcommand{bind}{\mathbin{\mathrm{\gg=}}}%
@@ -10,7 +10,7 @@ $$\newcommand{cat}{\mathsf}%
 \newcommand{natto}{\stackrel{\bullet}{\to}}%
 \newcommand{Id}{\mathrm{Id}}%
 $$
-
+</div>
 The quote in the title is from James Iry's
 [A Brief, Incomplete, and Mostly Wrong History of Programming Languages][iry]
 in which he jokingly attributes the quote to Philip Wadler, one of the

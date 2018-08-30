@@ -1,7 +1,7 @@
 ---
 title: Monads from adjunctions, adjunctions from monads.
 ---
-
+<div style="display:none;">
 $$\newcommand{cat}{\mathsf}%
 \newcommand{id}{\mathrm{id}}%
 \newcommand{bind}{\mathbin{\mathrm{\gg=}}}%
@@ -9,7 +9,7 @@ $$\newcommand{cat}{\mathsf}%
 \newcommand{natto}{\Rightarrow}%{\stackrel{\bullet}{\to}}%
 \newcommand{Id}{\mathrm{Id}}%
 $$
-
+</div>
 There is a tight relationship between monads and adjunctions. In fact,
 it is easy to see that every pair of adjoint functors yields a
 monad. What is really interesting is that conversely, every monad

@@ -29,13 +29,15 @@
         
     </section>
     <section>
-        <p><span class="math display">\[\newcommand{cat}{\mathsf}%
+        <div style="display:none;">
+<p><span class="math display">\[\newcommand{cat}{\mathsf}%
 \newcommand{id}{\mathrm{id}}%
 \newcommand{bind}{\mathbin{\mathrm{\gg=}}}%
 \newcommand{hom}{\mathrm{hom}}%
 \newcommand{natto}{\Rightarrow}%{\stackrel{\bullet}{\to}}%
 \newcommand{Id}{\mathrm{Id}}%
 \]</span></p>
+</div>
 <p>There is a tight relationship between monads and adjunctions. In fact, it is easy to see that every pair of adjoint functors yields a monad. What is really interesting is that conversely, every monad arises by some adjunction.</p>
 <p>Let’s look at an example first. Fix a set <span class="math inline">\(S\)</span>, then there is a natural bijection of hom-sets in the category <span class="math inline">\(\cat{Set}\)</span>:</p>
 <p><span class="math display">\[c: \hom(X\times S, Y)\xrightarrow{\cong}\hom(X, \hom(S, Y)),\]</span></p>
