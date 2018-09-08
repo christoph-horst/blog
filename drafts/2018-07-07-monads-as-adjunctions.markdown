@@ -143,8 +143,7 @@ a category $C$.
 Let $C_M$ be the category whose objects are exactly the objects of
 $C$, and whose arrows from $X$ to $Y$ are exactly the $C$-morphisms
 $X\to MY$. To avoid confusion, we're going to write $X\to_M Y$ for
-the arrows in $C_M$ and $X\to Y$ for arrows in $C$. This way, an arrow
-$X\to Y$ is precisely the same as an arrow $X\to_M Y$.
+the arrows in $C_M$ and $X\to Y$ for arrows in $C$.
 
 Given arrows $f: X\to MY$, $g: Y\to MZ$, an arrow $g\circ_M f:
 X\to MZ$ is given by the *Kleisli composition*, $g\circ_M f :=
