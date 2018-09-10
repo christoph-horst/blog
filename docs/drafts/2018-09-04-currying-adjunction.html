@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>My Hakyll Blog - The currying adjunction (2nd draft)</title>
+        <link rel="stylesheet" href="../css/default.css" />
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="../">My Hakyll Blog</a>
+            </div>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <!--<a href="/contact.html">Contact</a>-->
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>The currying adjunction (2nd draft)</h1>
+            <article>
+    <section class="header">
+        Posted on September  4, 2018
+        
+    </section>
+    <section>
+        <div "style="display:none;&quot;">
+<p><span class="math display">\[\newcommand{cat}{\mathsf}%
+\newcommand{id}{\mathrm{id}}%
+\newcommand{bind}{\mathbin{\mathrm{\gg=}}}%
+\newcommand{hom}{\mathrm{hom}}%
+\newcommand{natto}{\Rightarrow}%{\stackrel{\bullet}{\to}}%
+\newcommand{Id}{\mathrm{Id}}%
+\]</span></p>
+</div>
+<p>Let <span class="math inline">\(F\)</span>, <span class="math inline">\(G\)</span> be endofunctors of <span class="math inline">\(\cat{Set}\)</span>, <span class="math inline">\(F\dashv G\)</span>, with unit <span class="math inline">\(\eta\)</span> and counit <span class="math inline">\(\varepsilon\)</span>. Then there is a natural isomorphism of sets, <span class="math inline">\(\Phi_{AB} : \hom(FA, B)\cong\hom(A,GB)\)</span>, so if we choose a singleton set <span class="math inline">\(I=\{*\}\)</span> for <span class="math inline">\(A\)</span>, we obtain an isomorphism <span class="math inline">\(\hom(FI, B)\cong\hom(I,GB)\cong GB\)</span>. This means that <span class="math inline">\(G\)</span> is a representable functor:</p>
+<p><span class="math display">\[G \cong \hom(FI, -)\]</span></p>
+<p>If we now apply the functor <span class="math inline">\(\hom(A, -)\)</span> and use the adjunction, we obtain</p>
+<p><span class="math display">\[\hom(FA, B)\cong \hom(A, GB)\cong \hom(A,\hom(FI, B)) \cong
+\hom(A\times FI, B),\]</span></p>
+<p>by the Yoneda Lemma this implies an isomorphism</p>
+<p><span class="math display">\[F \cong -\times FI.\]</span></p>
+<p>This means that, up to isomorphism of functors, every pair of adjoint functors in <span class="math inline">\(\mathsf{Set}\)</span> arises by choosing a set <span class="math inline">\(S\)</span> and defining <span class="math inline">\(FI := S\)</span>.</p>
+<p><strong>Question</strong>: Does that mean that the monad <span class="math inline">\(M = GF\)</span> with unit <span class="math inline">\(\eta\)</span> and multiplication <span class="math inline">\(\mu = G\bullet\varepsilon\bullet F\)</span> is isomorphic to the state monad with state <span class="math inline">\(S\)</span>?</p>
+<h1 id="preparations">Preparations</h1>
+<p>Let <span class="math inline">\(S = FI\)</span>, and let <span class="math inline">\(f = f^S : GF\natto \hom(S, -\times S)\)</span> be the isomorphism of functors mentioned before. In order to show that <span class="math inline">\(f\)</span> is an isomorphism of monads, we must show that the following diagrams commute</p>
+<p><span class="math display">\[\require{AMScd}
+\begin{CD}
+GFGF @&gt;{f\bullet f}&gt;&gt; \hom(S,\hom(S,-\times S)\times S)\\
+@V{\mu}VV                     @V{\mu^S}VV \\
+GF @&gt;{f}&gt;&gt; \hom(S,-\times S)
+\end{CD}
+\]</span></p>
+<p>and <span class="math display">\[\begin{CD}
+\Id @= \Id\\
+@V{\eta}VV @V{\eta^S}VV \\
+GF @&gt;{f}&gt;&gt; \hom(S,-\times S)
+\end{CD}\]</span></p>
+<p>where <span class="math inline">\(\eta^S : \Id \natto \hom(S,-\times S)\)</span> is the unit and <span class="math inline">\(\mu^S : \hom(S,\hom(S,-\times S)\times S)\natto\hom(S,-\times S)\)</span> is the multiplication of the state monad.</p>
+<h1 id="lets-go">Let’s go</h1>
+<p>I’m going to compute an explicit representation of <span class="math inline">\(f\)</span> and check directly whether the diagrams commute. This is going to be a bit of work…</p>
+<p>First recall that the adjunction map arises from the unit and counit as follows: <span class="math inline">\(\Phi_{AB}(\varphi) = G(\varphi)\circ\eta_A\)</span>, <span class="math inline">\(\Phi_{AB}^{-1}(\psi) = \varepsilon_B\circ F(\psi)\)</span>.</p>
+<p>For each set <span class="math inline">\(A\)</span>, there is an isomorphism <span class="math inline">\(e_A: \hom(I, A)\cong A\)</span>, <span class="math inline">\(e_A(f) = f(*)\)</span>, the evaluation at <span class="math inline">\(*\)</span>. Therefore there is an isomorphism <span class="math inline">\(\alpha_B : \begin{CD}\hom(FI, B) @&gt;{\Phi_{IB}}&gt;&gt; \hom(I, GB) @&gt;{e_{GB}}&gt;&gt; GB\end{CD}\)</span>, <span class="math inline">\(\varphi\mapsto e_{GB}\left ( G(\varphi)\circ\eta_I \right ) = G(\varphi)(\eta_I(*))\)</span>. We’re actually going to need the inverse of that, it’s</p>
+<p><span class="math display">\[\alpha_B^{-1} : GB \to \hom(FI, B)\\
+y\mapsto \varepsilon_B\circ F(*\mapsto y).\]</span></p>
+<p>Let <span class="math inline">\(c^S_{AB} : \hom(A\times S, B)\cong\hom(A,\hom(S, B))\)</span> denote the curry map, <span class="math inline">\(\varphi \mapsto (a\mapsto (a\mapsto \varphi(a,s)))\)</span>. It is an adjunction map between <span class="math inline">\(A\times -\)</span> and <span class="math inline">\(\hom(S, -)\)</span>. Then we obtain an isomorphism</p>
+<p><span class="math display">\[\hom(A\times FI, B)\to \hom(A,\hom(FI, B))\to \hom(A, GB)\to
+\hom(FA, B),\\ \varphi \mapsto \varepsilon_B\circ F(a\mapsto
+G(x\mapsto\varphi(a,x))(\eta_I(*))).\]</span></p>
+<p>By applying it to the identity on <span class="math inline">\(A\times FI\)</span>, we obtain an isomorphism</p>
+<p><span class="math display">\[\gamma_A : FA\cong A\times FI,\\
+\gamma_A = \varepsilon \circ
+F(a\mapsto G(x\mapsto (a,x))(\eta_I(*))).\]</span></p>
+<p>We can now form the horizontal composition <span class="math inline">\(f = \alpha^{-1}\bullet \gamma : GF\natto \hom(FI, -\times FI)\)</span>. Recall the diagram</p>
+<p><span class="math display">\[
+\begin{CD}
+GFA @&gt;{G(\gamma_A)}&gt;&gt; G(A\times FI)\\
+@V{\alpha^{-1}_{FA}}VV   @V{\alpha^{-1}_{A\times FI}}VV\\
+\hom(FI, FA) @&gt;{\hom(FI, \gamma_A)}&gt;&gt; \hom(FI, A\times FI)
+\end{CD}\]</span></p>
+<p>From the two ways to compute this map, the lower path seems to be more approachable:</p>
+<p><span class="math display">\[\begin{align*}
+f_A(y) &amp;= \gamma_A \circ \alpha^{-1}_{FA}(y)\\
+&amp;= \varepsilon_{A\times FI} \circ F(a\mapsto G(x\mapsto (a, x))(\eta_I(*))) \circ \varepsilon_{FA} \circ F(*\mapsto y)
+\end{align*}
+\]</span></p>
+<p>This is getting ugly …</p>
+<h1 id="the-easy-part-check-compatibility-with-the-unit">The “easy” part: Check compatibility with the unit</h1>
+<p>This is the condition <span class="math inline">\(f_A(\eta_A(a)) = \eta^{FI})A(a) = (x\mapsto (a, x))\)</span> for all <span class="math inline">\(a\in A\)</span>. Fearless as we are, let’s apply <span class="math inline">\(f_A\)</span> to an argument:</p>
+<p><span class="math display">\[f_A(\eta_A(a)) = \varepsilon_{A\times FI} \circ F(a\mapsto G(x\mapsto (a, x))(\eta_I(*))) \circ \varepsilon_{FA} \circ F(*\mapsto \eta_A(a))\]</span></p>
+<p>It’s time for little simplification. Let <span class="math inline">\(\hat{a}\)</span> denote the constant map <span class="math inline">\(*\mapsto a\)</span>. Then <span class="math inline">\(*\mapsto \eta_A(a)\)</span> can be written as composition <span class="math inline">\(\eta_A\circ \hat{a}\)</span>. This way, the part <span class="math inline">\(\varepsilon_{FA}\circ F(*\mapsto\eta_A(a))\)</span> becomes <span class="math inline">\(\varepsilon_{FA} \circ F(\eta_A) \circ F(\hat{a})\)</span>, which is just <span class="math inline">\(F(\hat{a})\)</span> by the triangle equation! We now have</p>
+<p><span class="math display">\[
+\begin{align*}
+f_A(\eta_A(a)) &amp;= \varepsilon_{A\times FI} \circ F(a\mapsto G(x\mapsto (a, x))(\eta_I(*))) \circ F(\hat{a})\\
+&amp;= \varepsilon_{A\times FI} \circ F(* \mapsto G(x\mapsto (a, x))(\eta_I(*)))\\
+&amp;= \varepsilon_{A\times FI} \circ F(G(x\mapsto (a,x))\circ\eta_I)\\
+&amp;= \varepsilon_{A\times FI} \circ FG(x\mapsto (a,x)) \circ F(\eta_I)
+\end{align*}\]</span></p>
+<p>Now use naturality of <span class="math inline">\(\varepsilon\)</span>:</p>
+<p><span class="math display">\[
+\begin{align*}
+f_A(\eta_A(a)) &amp;= (x\mapsto (a,x)) \circ \varepsilon_{FI} \circ F(\eta_I)\\
+&amp;= (x\mapsto (a,x))\\
+&amp;= \eta^{FI}_A(a)
+\end{align*}
+\]</span></p>
+<p>by the triangle equation again!</p>
+<h1 id="trembling-now-compatibility-with-multiplication">Trembling now … compatibility with multiplication</h1>
+<p>So now we have to check that <span class="math inline">\(\mu^{FI}_A\circ(f\bullet f) = f\circ\mu_A\)</span>, right? I’m afraid to tackle this directly. Each step means scribbling more than a line of symbols where you easily lose track of parentheses. There must be an easier way. Let’s look at the problem again, abstractly.</p>
+<p>Say we have two adjoint pairs, <span class="math inline">\(F\dashv G\)</span> and <span class="math inline">\(F'\dashv G'\)</span>, and morphisms <span class="math inline">\(\alpha: G\natto G'\)</span> and <span class="math inline">\(\beta : F\natto F'\)</span>, and we want to prove that the following diagram commutes:</p>
+<p><span class="math display">\[\begin{CD}
+GFGF @&gt;{\alpha\bullet\beta\bullet\alpha\bullet\beta}&gt;&gt; G'F'G'F'\\
+@V{\mu}VV                                              @V{\mu'}VV\\
+GF   @&gt;{\alpha\bullet\beta}&gt;&gt;                          G'F'
+\end{CD}\]</span></p>
+<p>where <span class="math inline">\(\mu = G\bullet\varepsilon\bullet F\)</span> and <span class="math inline">\(\mu' = G'\bullet\varepsilon'\bullet F'\)</span>. We can employ the <em>interchange law</em> between horizontal and vertical composition, which states (cited from MacLane<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>) that</p>
+<p><span class="math display">\[(\tau'\circ \sigma')\bullet(\tau\circ \sigma) = (\tau'\bullet\tau)\circ(\sigma'\bullet\sigma)\]</span></p>
+<p>if the compositions make sense. Let’s apply this law:</p>
+<p><span class="math display">\[\begin{align*}
+\mu' \circ (\alpha\bullet\beta\bullet\alpha\bullet\beta) &amp;= (G'\bullet\varepsilon'\bullet F')\circ(\alpha\bullet\beta\bullet\alpha\bullet\beta)\\
+&amp;= (G'\bullet(\varepsilon'\bullet F'))\circ(\alpha\bullet(\beta\bullet\alpha\bullet\beta))\\
+&amp;= (G'\circ\alpha) \bullet  ((\varepsilon'\bullet F')\circ ((\beta\bullet\alpha)\bullet\beta))\\
+&amp;= (G'\circ\alpha) \bullet (\varepsilon' \circ (\beta\bullet\alpha)) \bullet (F'\circ \beta)\\
+&amp;= \alpha \bullet (\varepsilon' \circ (\beta\bullet\alpha)) \bullet \beta\\
+&amp;\stackrel{?}{=} \alpha \bullet\varepsilon\bullet\beta\\
+&amp;= (\alpha\circ G)\bullet((\Id\bullet\Id)\circ \varepsilon)\bullet(\beta\circ F)\\
+&amp;= (\alpha\bullet\beta)\circ(G\bullet\varepsilon\bullet F)\\
+&amp;= (\alpha\bullet\beta)\circ\mu.
+\end{align*}\]</span></p>
+<p>We find that it suffices to prove <span class="math inline">\(\varepsilon = \varepsilon'\circ(\beta\bullet\alpha)\)</span>. In our case, that would be</p>
+<p><span class="math display">\[\varepsilon = \varepsilon^{FI}\circ(\gamma\bullet\alpha^{-1}).\]</span></p>
+<p>Let’s keep the notation <span class="math inline">\(G' = \hom(FI, -)\)</span> and <span class="math inline">\(F' = -\times FI\)</span> for a bit. Recall then the natural transformations <span class="math inline">\(\alpha : G'\natto G\)</span> and <span class="math inline">\(\gamma : F\natto F'\)</span>, where <span class="math inline">\(\gamma_A\)</span> is the composition</p>
+<p><span class="math display">\[\begin{CD}
+\hom(F'A, B) @&gt;{\Phi'_{AB}}&gt;&gt; \hom(A, G'B) @&gt;{\alpha_B\circ -}&gt;&gt; \hom(A, GB) @&gt;{\Phi^{-1}_{AB}}&gt;&gt; \hom(FA, B)
+\end{CD}\]</span></p>
+<p>applied to <span class="math inline">\(\id_{F'A}\)</span>, that is,</p>
+<p><span class="math display">\[\begin{align*}
+\gamma_A &amp;= \Phi^{-1}_{A,F'A}(\alpha_{F'A}\circ \Phi'_{A,F'A}(\id_{F'A}))\\
+&amp;= \varepsilon_{F'A}\circ F(\alpha_{F'A}\circ \eta'_A)
+\end{align*}.\]</span></p>
+<p>Then</p>
+<p><span class="math display">\[\begin{align*}
+\varepsilon'_A \circ \gamma_{G'A} \circ F(\alpha^{-1}_A) &amp;= \underline{\varepsilon'_A \circ \varepsilon_{F'G'A}} \circ F(\alpha_{F'G'A}\circ \eta'_{G'A} \circ \alpha^{-1}_A)\\
+&amp;= \varepsilon_A \circ FG(\varepsilon'_A) \circ F(\alpha_{F'G'A}\circ \eta'_{G'A} \circ \alpha^{-1}_A)\\
+&amp;= \varepsilon_A \circ F(\underline{G(\varepsilon'_A) \circ \alpha_{F'G'A}}\circ \eta'_{G'A} \circ \alpha^{-1}_A)\\
+&amp;= \varepsilon_A \circ F(\alpha_A\circ \underline{G'(\varepsilon'_A) \circ \eta'_{G'A}} \circ \alpha^{-1}_A)\\
+&amp;= \varepsilon_A \circ F(\alpha_A\circ \alpha^{-1}_A)\\
+&amp;= \varepsilon_A
+\end{align*}\]</span></p>
+<p>by naturality of <span class="math inline">\(\varepsilon : FG\natto\Id\)</span>, <span class="math inline">\(\alpha : G'\natto G\)</span>, and the triangle equation <span class="math inline">\((G'\bullet\varepsilon') \circ (\eta'\bullet G') = \id_{G'}\)</span>.</p>
+<p>This concludes the proof. The morphism <span class="math inline">\(f : GF\to \hom(FI, -\times FI)\)</span> is an isomorphism of monads.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Note that MacLane uses <span class="math inline">\(\circ\)</span> for horizontal and <span class="math inline">\(\cdot\)</span> for vertical composition.<a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+    </section>
+</article>
+
+        </main>
+
+        <footer>
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </footer>
+    </body>
+</html>
