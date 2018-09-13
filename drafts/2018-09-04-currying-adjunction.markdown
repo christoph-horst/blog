@@ -1,5 +1,5 @@
 ---
-title: The currying adjunction (2nd draft)
+title: The State monad and the currying adjunction
 ---
 <div "style=display:none;">
 $$\newcommand{cat}{\mathsf}%
@@ -11,119 +11,150 @@ $$\newcommand{cat}{\mathsf}%
 $$
 </div>
 
+A few weeks ago, someone mentioned to me that there is essentially
+only one adjunction of endofunctors of $\cat{Set}$. For every set $S$,
+the functor $-\times S$ is left adjoint to the functor $\hom(S,-)$,
+where the adjunction
+
+$$\Phi^S_{AB} : \hom(A\times S, B)\to\hom(A,\hom(S, B))$$
+
+takes a map $\varphi : A\times S\to B$ to its *curried* version
+$A\to\hom(S, B), a\mapsto(s\mapsto \varphi(a,s))$. The reason that
+this is essentially the only adjunction of this kind goes roughly as
+follows:
+
 Let $F$, $G$ be endofunctors of $\cat{Set}$, $F\dashv G$, with unit
 $\eta$ and counit $\varepsilon$. Then there is a natural isomorphism
-of sets, $\Phi_{AB} : \hom(FA, B)\cong\hom(A,GB)$, so if we choose a
-singleton set $I=\{*\}$ for $A$, we obtain an isomorphism $\hom(FI,
-B)\cong\hom(I,GB)\cong GB$. This means that $G$ is a representable
-functor:
+of sets, the adjunction map, $\Phi_{AB} : \hom(FA,
+B)\to\hom(A,GB)$. The central element of the argument is the
+following: Choose a singleton set $I = \{*\}$, and let, for all sets
+$B$, $e_B : \hom(I, B)\to B$ the the evaluation map,
+i.e. $e_B(\varphi) = \varphi(*)$. Then $e$ is a natural isomorphism,
+so we obtain an isomorphism $\hom(FI, B)\cong\hom(I,GB)\cong GB$. This
+means that $G$ is a *representable functor* represented by the set
+$FI$:
 
 $$G \cong \hom(FI, -)$$
 
-If we now apply the functor $\hom(A, -)$ and use the adjunction, we obtain
+If we now apply the functor $\hom(A, -)$ and use the given adjunction
+and the currying adjunction, we obtain
 
 $$\hom(FA, B)\cong \hom(A, GB)\cong \hom(A,\hom(FI, B)) \cong
 \hom(A\times FI, B),$$
 
-by the Yoneda Lemma this implies an isomorphism
+and by the Yoneda Lemma this implies an isomorphism
 
 $$F \cong -\times FI.$$
 
 This means that, up to isomorphism of functors, every pair of adjoint
-functors in $\mathsf{Set}$ arises by choosing a set $S$ and defining
+functors in $\mathsf{Set}$ arises by choosing a set $S$ and setting
 $FI := S$.
 
-**Question**: Does that mean that the monad $M = GF$ with unit $\eta$ and
-multiplication $\mu = G\bullet\varepsilon\bullet F$ is isomorphic to
-the state monad with state $S$?
+Now, we know that every adjunction $F\dashv G$ gives rise to a monad
+$M = G\circ F$, whose unit $\eta$ is just the unit of the adjunction,
+and whose multiplication is derived from the counit, $\mu =
+G\bullet\varepsilon\bullet F$. For example, the currying adjunction
+gives rise to the *state* monad $\mathrm{St}^S = \hom(S,-)\circ
+-\times S = \hom(S, -\times S)$. And from the above discussion it is
+clear that there is an *isomorphism of functors* $f :
+M\stackrel{\sim}{\natto} \mathrm{St}^{FI}$.
+
+**Question**: Is $f$ an isomorphism *of monads*?
 
 # Preparations
 
-Let $S = FI$, and let $f = f^S : GF\natto \hom(S, -\times S)$ be the
-isomorphism of functors mentioned before. In order to show that $f$ is
-an isomorphism of monads, we must show that the following diagrams
-commute
+Let $(M,\eta,\mu)$ and $(M',\eta',\mu')$ be monads of a category $C$,
+and let $f : M\natto M'$ be a natural transformation, i.e. a morphism
+of endofunctors. We say $f$ is a *morphism of monads* if it is
+compatible with the units and the multiplications, in the sense that the following diagrams commute:
 
 $$\require{AMScd}
 \begin{CD}
-GFGF @>{f\bullet f}>> \hom(S,\hom(S,-\times S)\times S)\\
-@V{\mu}VV                     @V{\mu^S}VV \\
-GF @>{f}>> \hom(S,-\times S)
-\end{CD}
-$$
-
-and
-$$\begin{CD}
 \Id @= \Id\\
-@V{\eta}VV @V{\eta^S}VV \\
-GF @>{f}>> \hom(S,-\times S)
+@V{\eta}VV  @V{\eta'}VV\\
+M @>{f}>> M'
 \end{CD}$$
 
-where $\eta^S : \Id \natto \hom(S,-\times S)$ is the unit and $\mu^S :
-\hom(S,\hom(S,-\times S)\times S)\natto\hom(S,-\times S)$ is the
-multiplication of the state monad.
+and
+
+$$
+\begin{CD}
+M\circ M @>{f\bullet f}>> M'\circ M'\\
+@V{\mu}VV                  @V{\mu'}VV\\
+M        @>{f}>>          M'
+\end{CD}$$
+
+So far we only know that there is *some* isomorphism of functors $f :
+M\natto \mathrm{St}^S$. What we have to do is therefore: First, walk
+through the argument again, recording the maps at each step to find an
+explicit description of $f$. Then, see if we can check the
+compatibility conditions. This is going to be a bit of work ...
 
 # Let's go
 
-I'm going to compute an explicit representation of $f$ and check
-directly whether the diagrams commute. This is going to be a bit of work...
-
-First recall that the adjunction map arises from the unit and counit
-as follows: $\Phi_{AB}(\varphi) = G(\varphi)\circ\eta_A$,
+Recall that the adjunction map can be written in terms of the unit and
+counit as follows: $\Phi_{AB}(\varphi) = G(\varphi)\circ\eta_A$, and
 $\Phi_{AB}^{-1}(\psi) = \varepsilon_B\circ F(\psi)$.
 
-For each set $A$, there is an isomorphism $e_A: \hom(I, A)\cong A$, $e_A(f) =
-f(*)$, the evaluation at $*$. Therefore there is an isomorphism
-$\alpha_B : \begin{CD}\hom(FI, B) @>{\Phi_{IB}}>> \hom(I, GB)
-@>{e_{GB}}>> GB\end{CD}$, $\varphi\mapsto e_{GB}\left (
-G(\varphi)\circ\eta_I \right ) = G(\varphi)(\eta_I(*))$. We're actually going to need the inverse of that, it's
+Also recall the natural isomorphism given by the evaluation map $e_B:
+\hom(I, B)\to B, \varphi\mapsto\varphi(*)$.
 
-$$\alpha_B^{-1} : GB \to \hom(FI, B)\\
-y\mapsto \varepsilon_B\circ F(*\mapsto y).$$
+So we have a natural isomorphism
 
-Let $c^S_{AB} : \hom(A\times S, B)\cong\hom(A,\hom(S, B))$ denote the
-curry map, $\varphi \mapsto (a\mapsto (a\mapsto \varphi(a,s)))$. It is
-an adjunction map between $A\times -$ and $\hom(S, -)$. Then we obtain
-an isomorphism
+$$e_{GB}\circ\Phi_{IB} : \hom(FI, B)
+\xrightarrow{\Phi_{IB}} \hom(I, GB) \xrightarrow{e_{GB}} GB.$$
 
-$$\hom(A\times FI, B)\to \hom(A,\hom(FI, B))\to \hom(A, GB)\to
-\hom(FA, B),\\ \varphi \mapsto \varepsilon_B\circ F(a\mapsto
-G(x\mapsto\varphi(a,x))(\eta_I(*))).$$
+Let $\alpha : G\natto\hom(FI,-)$ be the inverse of that, $\alpha_A(x)
+= \Phi^{-1}_{IB}(e_{GB}^{-1}(x)) = \varepsilon_B\circ F(*\mapsto
+x)$. We're going to need the inverse of that, too, it's
+$\alpha^{-1}_A(\varphi) = G(\varphi)(\eta_I(*))$.
+
+Apply the functor $\hom(A, -)$ and compose with $\Phi$ and the
+currying map $\Phi^{FI}$, this yields an isomorphism
+
+$$\begin{align*}
+\hom(A\times FI, B)&\xrightarrow{\Phi^{FI}_{AB}} \hom(A,\hom(FI, B))\xrightarrow{\alpha^{-1}_B\circ-} \hom(A, GB)\xrightarrow{\Phi^{-1}_{AB}} \hom(FA, B),\\
+\varphi &\mapsto \varepsilon_B \circ F(\alpha^{-1}_B\circ \Phi^{FI}_{AB}(\varphi))\\
+&= \varepsilon_B\circ F(a\mapsto G(x\mapsto\varphi(a,x))(\eta_I(*))).
+\end{align*}$$
 
 By applying it to the identity on $A\times FI$, we obtain an
 isomorphism
 
-$$\gamma_A : FA\cong A\times FI,\\
-\gamma_A = \varepsilon \circ
-F(a\mapsto G(x\mapsto (a,x))(\eta_I(*))).$$
+$$\begin{align*}
+\beta_A &: FA \to A\times FI,\\
+\beta_A &= \varepsilon_{A\times FI} \circ F(a\mapsto G(x\mapsto (a,x))(\eta_I(*))).
+\end{align*}$$
 
-We can now form the horizontal composition $f = \alpha^{-1}\bullet
-\gamma : GF\natto \hom(FI, -\times FI)$. Recall the diagram
+We can now form the horizontal composition $f = \alpha\bullet
+\beta : GF \natto \hom(FI, -\times FI)$. Recall the diagram
 
 $$
 \begin{CD}
-GFA @>{G(\gamma_A)}>> G(A\times FI)\\
-@V{\alpha^{-1}_{FA}}VV   @V{\alpha^{-1}_{A\times FI}}VV\\
-\hom(FI, FA) @>{\hom(FI, \gamma_A)}>> \hom(FI, A\times FI)
+GFA @>{G(\beta_A)}>> G(A\times FI)\\
+@V{\alpha_{FA}}VV   @V{\alpha_{A\times FI}}VV\\
+\hom(FI, FA) @>{\hom(FI, \beta_A)}>> \hom(FI, A\times FI)
 \end{CD}$$
 
 From the two ways to compute this map, the lower path seems to be more
 approachable:
 
 $$\begin{align*}
-f_A(y) &= \gamma_A \circ \alpha^{-1}_{FA}(y)\\
+f_A(y) &= \beta_A \circ \alpha_{FA}(y)\\
 &= \varepsilon_{A\times FI} \circ F(a\mapsto G(x\mapsto (a, x))(\eta_I(*))) \circ \varepsilon_{FA} \circ F(*\mapsto y)
 \end{align*}
 $$
 
 This is getting ugly ...
 
-# The "easy" part: Check compatibility with the unit
+# The "easy" part: Compatibility with the unit
 
-This is the condition $f_A(\eta_A(a)) = \eta^{FI})A(a) = (x\mapsto (a,
-x))$ for all $a\in A$. Fearless as we are, let's apply $f_A$ to an argument:
+This is the condition $f_A(\eta_A(a)) = \eta^{FI}_A(a)$ for all $a\in
+A$. Fearless as we are, let's apply $f_A$ to an argument:
 
-$$f_A(\eta_A(a)) = \varepsilon_{A\times FI} \circ F(a\mapsto G(x\mapsto (a, x))(\eta_I(*))) \circ \varepsilon_{FA} \circ F(*\mapsto \eta_A(a))$$
+$$f_A(\eta_A(a)) = \varepsilon_{A\times FI} \circ F(a\mapsto
+G(x\mapsto (a, x))(\eta_I(*))) \circ \varepsilon_{FA} \circ F(*\mapsto
+\eta_A(a))$$
 
 It's time for little simplification. Let $\hat{a}$ denote the constant
 map $*\mapsto a$. Then $*\mapsto \eta_A(a)$ can be written as
@@ -193,36 +224,38 @@ $$\begin{align*}
 \end{align*}$$
 
 We find that it suffices to prove $\varepsilon =
-\varepsilon'\circ(\beta\bullet\alpha)$. In our case, that would be
+\varepsilon'\circ(\beta\bullet\alpha)$!
 
-$$\varepsilon = \varepsilon^{FI}\circ(\gamma\bullet\alpha^{-1}).$$
+Let's keep the notation $G' = \hom(FI, -)$ and $F' = -\times FI$ for a
+bit, along with $\eta'$, $\varepsilon'$ and $\Phi'$. Recall then the
+natural transformations $\alpha : G\natto G'$ and $\beta : F\natto
+F'$, where $\beta_A$ is the composition
 
-Let's keep the notation $G' = \hom(FI, -)$ and $F' = -\times FI$ for a bit. Recall then the natural transformations $\alpha : G'\natto G$ and $\gamma : F\natto F'$, where $\gamma_A$ is the composition
-
-$$\begin{CD}
-\hom(F'A, B) @>{\Phi'_{AB}}>> \hom(A, G'B) @>{\alpha_B\circ -}>> \hom(A, GB) @>{\Phi^{-1}_{AB}}>> \hom(FA, B)
-\end{CD}$$
+$$
+\hom(F'A, B) \xrightarrow{\Phi'_{AB}} \hom(A, G'B) \xrightarrow{\alpha^{-1}_B\circ -} \hom(A, GB) \xrightarrow{\Phi^{-1}_{AB}} \hom(FA, B)
+$$
 
 applied to $\id_{F'A}$, that is,
 
 $$\begin{align*}
-\gamma_A &= \Phi^{-1}_{A,F'A}(\alpha_{F'A}\circ \Phi'_{A,F'A}(\id_{F'A}))\\
-&= \varepsilon_{F'A}\circ F(\alpha_{F'A}\circ \eta'_A)
+\beta_A &= \Phi^{-1}_{A,F'A}(\alpha^{-1}_{F'A}\circ \Phi'_{A,F'A}(\id_{F'A}))\\
+&= \varepsilon_{F'A}\circ F(\alpha^{-1}_{F'A}\circ \eta'_A)
 \end{align*}.$$
 
 Then
 
 $$\begin{align*}
-\varepsilon'_A \circ \gamma_{G'A} \circ F(\alpha^{-1}_A) &= \underline{\varepsilon'_A \circ \varepsilon_{F'G'A}} \circ F(\alpha_{F'G'A}\circ \eta'_{G'A} \circ \alpha^{-1}_A)\\
-&= \varepsilon_A \circ FG(\varepsilon'_A) \circ F(\alpha_{F'G'A}\circ \eta'_{G'A} \circ \alpha^{-1}_A)\\
-&= \varepsilon_A \circ F(\underline{G(\varepsilon'_A) \circ \alpha_{F'G'A}}\circ \eta'_{G'A} \circ \alpha^{-1}_A)\\
-&= \varepsilon_A \circ F(\alpha_A\circ \underline{G'(\varepsilon'_A) \circ \eta'_{G'A}} \circ \alpha^{-1}_A)\\
-&= \varepsilon_A \circ F(\alpha_A\circ \alpha^{-1}_A)\\
+\varepsilon'_A \circ \beta_{G'A} \circ F(\alpha_A) &= \underline{\varepsilon'_A \circ \varepsilon_{F'G'A}} \circ F(\alpha^{-1}_{F'G'A}\circ \eta'_{G'A} \circ \alpha_A)\\
+&= \varepsilon_A \circ FG(\varepsilon'_A) \circ F(\alpha^{-1}_{F'G'A}\circ \eta'_{G'A} \circ \alpha_A)\\
+&= \varepsilon_A \circ F(\underline{G(\varepsilon'_A) \circ \alpha^{-1}_{F'G'A}}\circ \eta'_{G'A} \circ \alpha_A)\\
+&= \varepsilon_A \circ F(\alpha^{-1}_A\circ \underline{G'(\varepsilon'_A) \circ \eta'_{G'A}} \circ \alpha_A)\\
+&= \varepsilon_A \circ F(\alpha^{-1}_A\circ \alpha_A)\\
 &= \varepsilon_A
 \end{align*}$$
 
-by naturality of $\varepsilon : FG\natto\Id$, $\alpha : G'\natto G$,
+by naturality of $\varepsilon : FG\natto\Id$, $\alpha : G\natto G'$,
 and the triangle equation $(G'\bullet\varepsilon') \circ (\eta'\bullet
 G') = \id_{G'}$.
 
-This concludes the proof. The morphism $f : GF\to \hom(FI, -\times FI)$ is an isomorphism of monads.
+This concludes the proof. The morphism $f : GF\to \hom(FI, -\times
+FI)$ is an isomorphism of monads.
