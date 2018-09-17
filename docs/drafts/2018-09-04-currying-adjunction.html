@@ -131,7 +131,7 @@ GF   @&gt;{\alpha\bullet\beta}&gt;&gt;                          G'F'
 \end{CD}\]</span></p>
 <p>where <span class="math inline">\(\mu = G\bullet\varepsilon\bullet F\)</span> and <span class="math inline">\(\mu' = G'\bullet\varepsilon'\bullet F'\)</span>. We can employ the <em>interchange law</em> between horizontal and vertical composition, which states (cited from MacLane<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>) that</p>
 <p><span class="math display">\[(\tau'\circ \sigma')\bullet(\tau\circ \sigma) = (\tau'\bullet\tau)\circ(\sigma'\bullet\sigma)\]</span></p>
-<p>if the compositions make sense. Let’s apply this law:</p>
+<p>if the compositions make sense. Let’s apply this law (with a side of wishful thinking):</p>
 <p><span class="math display">\[\begin{align*}
 \mu' \circ (\alpha\bullet\beta\bullet\alpha\bullet\beta) &amp;= (G'\bullet\varepsilon'\bullet F')\circ(\alpha\bullet\beta\bullet\alpha\bullet\beta)\\
 &amp;= (G'\bullet(\varepsilon'\bullet F'))\circ(\alpha\bullet(\beta\bullet\alpha\bullet\beta))\\
@@ -155,7 +155,8 @@ GF   @&gt;{\alpha\bullet\beta}&gt;&gt;                          G'F'
 \end{align*}.\]</span></p>
 <p>Then</p>
 <p><span class="math display">\[\begin{align*}
-\varepsilon'_A \circ \beta_{G'A} \circ F(\alpha_A) &amp;= \underline{\varepsilon'_A \circ \varepsilon_{F'G'A}} \circ F(\alpha^{-1}_{F'G'A}\circ \eta'_{G'A} \circ \alpha_A)\\
+(\varepsilon'\circ(\beta\bullet\alpha))_A &amp;= \varepsilon'_A \circ \beta_{G'A} \circ F(\alpha_A)\\
+&amp;= \underline{\varepsilon'_A \circ \varepsilon_{F'G'A}} \circ F(\alpha^{-1}_{F'G'A}\circ \eta'_{G'A} \circ \alpha_A)\\
 &amp;= \varepsilon_A \circ FG(\varepsilon'_A) \circ F(\alpha^{-1}_{F'G'A}\circ \eta'_{G'A} \circ \alpha_A)\\
 &amp;= \varepsilon_A \circ F(\underline{G(\varepsilon'_A) \circ \alpha^{-1}_{F'G'A}}\circ \eta'_{G'A} \circ \alpha_A)\\
 &amp;= \varepsilon_A \circ F(\alpha^{-1}_A\circ \underline{G'(\varepsilon'_A) \circ \eta'_{G'A}} \circ \alpha_A)\\
@@ -164,6 +165,8 @@ GF   @&gt;{\alpha\bullet\beta}&gt;&gt;                          G'F'
 \end{align*}\]</span></p>
 <p>by naturality of <span class="math inline">\(\varepsilon : FG\natto\Id\)</span>, <span class="math inline">\(\alpha : G\natto G'\)</span>, and the triangle equation <span class="math inline">\((G'\bullet\varepsilon') \circ (\eta'\bullet G') = \id_{G'}\)</span>.</p>
 <p>This concludes the proof. The morphism <span class="math inline">\(f : GF\to \hom(FI, -\times FI)\)</span> is an isomorphism of monads.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>So, yeah. What does this mean? I was looking for a way to turn a monad “inside out” to construct some kind of “dual” comonad. Obviously that comonad would live in a different category in general, but wouldn’t it be nice if it was in the same category? It turns out that if this category is <span class="math inline">\(\cat{Set}\)</span>, then the only monad that can be built in this way is the state monad, which, when turned inside out, yields the “store” comonad, <span class="math inline">\(A\mapsto \hom(S, A)\times S\)</span>.</p>
 <div class="footnotes">
 <hr />
 <ol>

@@ -209,7 +209,8 @@ $$(\tau'\circ \sigma')\bullet(\tau\circ \sigma) = (\tau'\bullet\tau)\circ(\sigma
 
 [^MLNotation]: Note that MacLane uses $\circ$ for horizontal and $\cdot$ for vertical composition.
 
-if the compositions make sense. Let's apply this law:
+if the compositions make sense. Let's apply this law (with a side of
+wishful thinking):
 
 $$\begin{align*}
 \mu' \circ (\alpha\bullet\beta\bullet\alpha\bullet\beta) &= (G'\bullet\varepsilon'\bullet F')\circ(\alpha\bullet\beta\bullet\alpha\bullet\beta)\\
@@ -245,7 +246,8 @@ $$\begin{align*}
 Then
 
 $$\begin{align*}
-\varepsilon'_A \circ \beta_{G'A} \circ F(\alpha_A) &= \underline{\varepsilon'_A \circ \varepsilon_{F'G'A}} \circ F(\alpha^{-1}_{F'G'A}\circ \eta'_{G'A} \circ \alpha_A)\\
+(\varepsilon'\circ(\beta\bullet\alpha))_A &= \varepsilon'_A \circ \beta_{G'A} \circ F(\alpha_A)\\
+&= \underline{\varepsilon'_A \circ \varepsilon_{F'G'A}} \circ F(\alpha^{-1}_{F'G'A}\circ \eta'_{G'A} \circ \alpha_A)\\
 &= \varepsilon_A \circ FG(\varepsilon'_A) \circ F(\alpha^{-1}_{F'G'A}\circ \eta'_{G'A} \circ \alpha_A)\\
 &= \varepsilon_A \circ F(\underline{G(\varepsilon'_A) \circ \alpha^{-1}_{F'G'A}}\circ \eta'_{G'A} \circ \alpha_A)\\
 &= \varepsilon_A \circ F(\alpha^{-1}_A\circ \underline{G'(\varepsilon'_A) \circ \eta'_{G'A}} \circ \alpha_A)\\
@@ -259,3 +261,14 @@ G') = \id_{G'}$.
 
 This concludes the proof. The morphism $f : GF\to \hom(FI, -\times
 FI)$ is an isomorphism of monads.
+
+# Conclusion
+
+So, yeah. What does this mean? I was looking for a way to turn a monad
+"inside out" to construct some kind of "dual" comonad. Obviously that
+comonad would live in a different category in general, but wouldn't it
+be nice if it was in the same category? It turns out that if this
+category is $\cat{Set}$, then the only monad that can be built in this
+way is the state monad, which, when turned inside out, yields the
+"store" comonad, $A\mapsto \hom(S, A)\times S$.
+
