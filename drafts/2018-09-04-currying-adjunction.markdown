@@ -1,7 +1,7 @@
 ---
 title: The State monad and the currying adjunction
 ---
-<div "style=display:none;">
+<div style="display:none;">
 $$\newcommand{cat}{\mathsf}%
 \newcommand{id}{\mathrm{id}}%
 \newcommand{bind}{\mathbin{\mathrm{\gg=}}}%
