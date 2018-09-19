@@ -46,7 +46,7 @@ argument type of `g`.
 
 You can read a full account about how a monad is a monoid in my
 article [«A monad is just a monoid in the category of endofunctors,
-what's the problem?»](/drafts/2017-12-29-whats-the-problem.html).
+what's the problem?»](/drafts/whats-the-problem.html).
 
 The TL;DR is: The identity is `pure`, that much is correct, but the
 append operation is a function that is called `join :: Monad m => m (m

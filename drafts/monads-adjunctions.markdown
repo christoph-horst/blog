@@ -1,5 +1,6 @@
 ---
 title: Monads from adjunctions, adjunctions from monads.
+date: 2018-08-09
 ---
 <div style="display:none;">
 $$\newcommand{cat}{\mathsf}%

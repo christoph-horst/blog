@@ -1,5 +1,6 @@
 ---
 title: The State monad and the currying adjunction
+date: 2018-09-11
 ---
 <div style="display:none;">
 $$\newcommand{cat}{\mathsf}%

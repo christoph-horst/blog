@@ -1,5 +1,6 @@
 ---
 title: «A monad is just a monoid in the category of endofunctors, what's the problem?»
+date: 2018-01-29
 ---
 <div style="display:none;">
 $$\newcommand{cat}{\mathsf}%
