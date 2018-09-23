@@ -8,7 +8,7 @@ $$\newcommand{cat}{\mathsf}%
 \newcommand{bind}{\mathbin{\mathrm{\gg=}}}%
 \newcommand{kleisli}{\mathbin{\mathrm{>=>}}}%
 \newcommand{lkleisli}{\mathbin{\mathrm{<=<}}}%
-\newcommand{natto}{\stackrel{\bullet}{\to}}%
+\newcommand{natto}{\Rightarrow}%
 \newcommand{Id}{\mathrm{Id}}%
 $$
 </div>

@@ -21,32 +21,37 @@ composition*, that is, the following operator:
 (f >=> g) a = f a >>= g
 ```
 
-The laws then become:
+The laws then become
 
 * `f >=> pure == f`
 * `pure >=> g == g`
 * `(f >=> g) >=> h == f >=> (g >=> h)`
 
-The proof of equivalence is straight-forward by equational
-reasoning. So, isn't this the monoid we're looking for? With `pure`
-being the identity and `>=>` the append operation?
+Very familiar. So, isn't this the monoid we're looking for? With
+`pure` being the identity and `>=>` the append operation?
 
-**A Resounding** ***NO!***
+**NO!**
 
 These aren't the laws of a monoid, but the laws of a category, the
-*Kleisli category* corresponding to the monad. A category is very
-similar to a monoid, the difference is: In a monoid, any two elements
-may be appended, `x <> y` is always defined. In a category,
-composition is a *partial* operation, two arrows can be composed only
-if the codomain of the first matches the domain of the next. You can
-see this from the type of `(>=>) :: Monad m => (a -> m b) -> (b -> m
-c) -> (a -> m c)`. The composition `f >=> g` does not typecheck if the
-`b` in the return type of `f` is different from the `b` in the
-argument type of `g`.
+*Kleisli category* corresponding to the monad. A category is somewhat
+similar to a monoid -- in fact, a monoid can be interpreted as a
+special case of a category. The difference is: In a monoid, any two
+elements can be appended, `x <> y` is always defined. In contrast, in
+a category, the composition of arrows[^elements] is defined only if
+the endpoint of the one arrow coincides with the starting point of the
+next, so the composition is a *partial operation*.  You can see this
+from the type of `(>=>) :: Monad m => (a -> m b) -> (b -> m c) -> (a
+-> m c)`. The composition `f >=> g` does not typecheck if the `b` in
+the return type of `f` is different from the `b` in the argument type
+of `g`.
+
+[^elements]: A category consists of objects and arrows, an arrow
+starts at one object and ends at another (or loop back to the same
+object). The term "element" is not used for these.
 
 You can read a full account about how a monad is a monoid in my
 article [«A monad is just a monoid in the category of endofunctors,
-what's the problem?»](/drafts/whats-the-problem.html).
+what's the problem?»](/posts/whats-the-problem.html).
 
 The TL;DR is: The identity is `pure`, that much is correct, but the
 append operation is a function that is called `join :: Monad m => m (m

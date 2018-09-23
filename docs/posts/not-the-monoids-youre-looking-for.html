@@ -38,17 +38,23 @@
 <p>If you squint a little, doesn’t this look a bit like a right and left identity law and an associativity law? Just like the monoid laws? Let’s squint a little harder and rewrite the laws in terms of <em>Kleisli composition</em>, that is, the following operator:</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">(&gt;=&gt;) ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> (b <span class="ot">-&gt;</span> m c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m c)
 (f <span class="fu">&gt;=&gt;</span> g) a <span class="fu">=</span> f a <span class="fu">&gt;&gt;=</span> g</code></pre></div>
-<p>The laws then become:</p>
+<p>The laws then become</p>
 <ul>
 <li><code>f &gt;=&gt; pure == f</code></li>
 <li><code>pure &gt;=&gt; g == g</code></li>
 <li><code>(f &gt;=&gt; g) &gt;=&gt; h == f &gt;=&gt; (g &gt;=&gt; h)</code></li>
 </ul>
-<p>The proof of equivalence is straight-forward by equational reasoning. So, isn’t this the monoid we’re looking for? With <code>pure</code> being the identity and <code>&gt;=&gt;</code> the append operation?</p>
-<p><strong>A Resounding</strong> <strong><em>NO!</em></strong></p>
-<p>These aren’t the laws of a monoid, but the laws of a category, the <em>Kleisli category</em> corresponding to the monad. A category is very similar to a monoid, the difference is: In a monoid, any two elements may be appended, <code>x &lt;&gt; y</code> is always defined. In a category, composition is a <em>partial</em> operation, two arrows can be composed only if the codomain of the first matches the domain of the next. You can see this from the type of <code>(&gt;=&gt;) :: Monad m =&gt; (a -&gt; m b) -&gt; (b -&gt; m c) -&gt; (a -&gt; m c)</code>. The composition <code>f &gt;=&gt; g</code> does not typecheck if the <code>b</code> in the return type of <code>f</code> is different from the <code>b</code> in the argument type of <code>g</code>.</p>
-<p>You can read a full account about how a monad is a monoid in my article <a href="../drafts/whats-the-problem.html">«A monad is just a monoid in the category of endofunctors, what’s the problem?»</a>.</p>
+<p>Very familiar. So, isn’t this the monoid we’re looking for? With <code>pure</code> being the identity and <code>&gt;=&gt;</code> the append operation?</p>
+<p><strong>NO!</strong></p>
+<p>These aren’t the laws of a monoid, but the laws of a category, the <em>Kleisli category</em> corresponding to the monad. A category is somewhat similar to a monoid – in fact, a monoid can be interpreted as a special case of a category. The difference is: In a monoid, any two elements can be appended, <code>x &lt;&gt; y</code> is always defined. In contrast, in a category, the composition of arrows<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> is defined only if the endpoint of the one arrow coincides with the starting point of the next, so the composition is a <em>partial operation</em>. You can see this from the type of <code>(&gt;=&gt;) :: Monad m =&gt; (a -&gt; m b) -&gt; (b -&gt; m c) -&gt; (a -&gt; m c)</code>. The composition <code>f &gt;=&gt; g</code> does not typecheck if the <code>b</code> in the return type of <code>f</code> is different from the <code>b</code> in the argument type of <code>g</code>.</p>
+<p>You can read a full account about how a monad is a monoid in my article <a href="../posts/whats-the-problem.html">«A monad is just a monoid in the category of endofunctors, what’s the problem?»</a>.</p>
 <p>The TL;DR is: The identity is <code>pure</code>, that much is correct, but the append operation is a function that is called <code>join :: Monad m =&gt; m (m a) -&gt; m a</code> in Haskell. This seems incomprehensible at first, that’s because a monad is not in any way a monoid in the usual sense, but an arrow-theoretic generalization of a monoid, a thing called a <em>monoid object</em>, that can be defined in <em>monoidal categories</em>. If you want to know how this makes sense, seriously, read my article.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>A category consists of objects and arrows, an arrow starts at one object and ends at another (or loop back to the same object). The term “element” is not used for these.<a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
     </section>
 </article>
 
